@@ -6,9 +6,9 @@
   "type": "module",
   "scripts": {
     "build": "bun run build.ts",
+    "watch": "bun run build.ts --watch",
     "lint": "eslint",
-    "fmt": "prettier --write .",
-    "watch": "bun run --watch build.ts"
+    "fmt": "prettier --write ."
   },
   "author": "hawa130",
   "license": "",
