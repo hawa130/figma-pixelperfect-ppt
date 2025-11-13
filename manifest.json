@@ -1,0 +1,14 @@
+{
+  "name": "Figma to Image PPT",
+  "id": "1570841780768228356",
+  "api": "1.0.0",
+  "main": "main.js",
+  "ui": "ui.html",
+  "capabilities": [],
+  "enableProposedApi": false,
+  "documentAccess": "dynamic-page",
+  "editorType": ["figma", "slides"],
+  "networkAccess": {
+    "allowedDomains": ["none"]
+  }
+}

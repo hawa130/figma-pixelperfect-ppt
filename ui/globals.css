@@ -1,0 +1,4 @@
+@import "tailwindcss";
+@import "figma-kit/styles.css";
+
+@custom-variant dark (&:where(.dark, .dark *, .figma-dark, .figma-dark *));
