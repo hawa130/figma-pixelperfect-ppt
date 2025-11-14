@@ -18,6 +18,9 @@ async function buildMain() {
     transform: {
       target: 'es2017',
     },
+    treeshake: {
+      propertyWriteSideEffects: false,
+    }
   })
   await bundle.write({
     format: 'es',
