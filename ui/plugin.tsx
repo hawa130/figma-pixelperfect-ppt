@@ -13,11 +13,11 @@ export function Plugin() {
   useEffect(() => {
     onMainMessage((message) => {
       switch (message.type) {
-        case 'SELECTION_UPDATE':
+        case 'selection_update':
           setFrameCount(message.frameCount)
           setError(null)
           break
-        case 'EXPORT_COMPLETE': {
+        case 'export_complete': {
           createPptxFromImages(message.images)
             .then((bytes) => {
               downloadFile({ filename: `frames-${Date.now()}.pptx`, bytes, mimeType: MIME_TYPE_PPTX })
@@ -30,23 +30,23 @@ export function Plugin() {
             })
           break
         }
-        case 'EXPORT_ERROR':
+        case 'export_error':
           setIsExporting(false)
           setError(message.message)
           break
       }
     })
-    postMainMessage({ type: 'QUERY_SELECTION' })
+    postMainMessage({ type: 'query_selection' })
   }, [])
 
   function handleExport() {
-    postMainMessage({ type: 'EXPORT_FRAMES_AS_IMAGES' })
+    postMainMessage({ type: 'export_frames_as_images' })
     setIsExporting(true)
     setError(null)
   }
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-2 p-4">
       <div className="flex flex-col gap-2">
         <Text>
           Selected pages: <span className="font-semibold">{frameCount}</span>

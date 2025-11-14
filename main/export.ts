@@ -12,7 +12,7 @@ async function exportFrameAsImage(frame: BaseFrameMixin): Promise<ExportImageDat
 export async function exportFramesAsImages(frames: BaseFrameMixin[]) {
   if (frames.length === 0) {
     postUIMessage({
-      type: 'EXPORT_ERROR',
+      type: 'export_error',
       message: 'No frames selected',
     })
     return
@@ -27,7 +27,7 @@ export async function exportFramesAsImages(frames: BaseFrameMixin[]) {
     }
 
     postUIMessage({
-      type: 'EXPORT_COMPLETE',
+      type: 'export_complete',
       images,
     })
 
@@ -35,7 +35,7 @@ export async function exportFramesAsImages(frames: BaseFrameMixin[]) {
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Export failed'
     postUIMessage({
-      type: 'EXPORT_ERROR',
+      type: 'export_error',
       message,
     })
   }

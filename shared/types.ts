@@ -5,28 +5,28 @@ export interface ExportImageData {
 }
 
 interface SelectionUpdate {
-  type: 'SELECTION_UPDATE'
+  type: 'selection_update'
   frameCount: number
 }
 
 interface ExportComplete {
-  type: 'EXPORT_COMPLETE'
+  type: 'export_complete'
   images: ExportImageData[]
 }
 
 interface ExportError {
-  type: 'EXPORT_ERROR'
+  type: 'export_error'
   message: string
 }
 
 export type MessageToUI = SelectionUpdate | ExportComplete | ExportError
 
 interface ExportFramesAsImagesMessage {
-  type: 'EXPORT_FRAMES_AS_IMAGES'
+  type: 'export_frames_as_images'
 }
 
 interface QuerySelectionMessage {
-  type: 'QUERY_SELECTION'
+  type: 'query_selection'
 }
 
 export type MessageFromUI = ExportFramesAsImagesMessage | QuerySelectionMessage

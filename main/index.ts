@@ -6,10 +6,9 @@ function getSelectedFrames() {
 }
 
 async function handleExport() {
-  const PAGE_NUMBER_REGEX = /\d+/
   const frames = getSelectedFrames()
     .map((frame) => {
-      const match = frame.name.match(PAGE_NUMBER_REGEX)
+      const match = frame.name.match(/\d+/)
       return match ? { frame, pageNumber: parseInt(match[0], 10) } : { frame, pageNumber: 0xfffffff }
     })
     .sort((a, b) => a.pageNumber - b.pageNumber)
@@ -21,22 +20,22 @@ function main() {
   figma.on('selectionchange', () => {
     const frames = getSelectedFrames()
     postUIMessage({
-      type: 'SELECTION_UPDATE',
+      type: 'selection_update',
       frameCount: frames.length,
     })
   })
 
   onUIMessage((message) => {
     switch (message.type) {
-      case 'QUERY_SELECTION': {
+      case 'query_selection': {
         const frames = getSelectedFrames()
         postUIMessage({
-          type: 'SELECTION_UPDATE',
+          type: 'selection_update',
           frameCount: frames.length,
         })
         break
       }
-      case 'EXPORT_FRAMES_AS_IMAGES': {
+      case 'export_frames_as_images': {
         void handleExport()
         break
       }
