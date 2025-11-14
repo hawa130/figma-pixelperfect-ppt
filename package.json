@@ -8,7 +8,8 @@
     "build": "bun run build.ts",
     "watch": "bun run build.ts --watch",
     "lint": "eslint",
-    "fmt": "prettier --write ."
+    "fmt": "prettier --write .",
+    "check": "tsc --noEmit"
   },
   "author": "hawa130",
   "license": "",
