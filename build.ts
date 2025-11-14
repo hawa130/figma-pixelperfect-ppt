@@ -1,5 +1,5 @@
 import { watch } from 'fs'
-import { mkdir, rmdir } from 'fs/promises'
+import { mkdir, rmdir, stat } from 'fs/promises'
 import { dirname, join } from 'path'
 
 import tailwind from '@tailwindcss/postcss'
@@ -38,8 +38,55 @@ const buildOptions: BuildOptions = {
   outdir: 'dist',
 }
 
+interface BuildResult {
+  duration: number
+  files: { name: string; size: number }[]
+}
+
+// Format file size to human readable format
+function formatSize(bytes: number): string {
+  if (bytes === 0) return '0 B'
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`
+}
+
+// Format duration to human readable format
+function formatDuration(ms: number): string {
+  if (ms < 1000) return `${ms.toFixed(0)} ms`
+  return `${(ms / 1000).toFixed(2)} s`
+}
+
+// Get file size
+async function getFileSize(filePath: string): Promise<number> {
+  try {
+    const stats = await stat(filePath)
+    return stats.size
+  } catch {
+    return 0
+  }
+}
+
+// Print concise build summary (for non-watch mode)
+function printBuildSummary(allFiles: { name: string; size: number }[], totalDuration: number) {
+  console.log(`Bundled in ${formatDuration(totalDuration)}`)
+  console.log('')
+  for (const file of allFiles) {
+    console.log(`  ${file.name.padEnd(20)} ${formatSize(file.size)}`)
+  }
+}
+
+// Print single line build info (for watch mode)
+function printWatchInfo(result: BuildResult, buildType: string) {
+  const totalSize = result.files.reduce((sum, file) => sum + file.size, 0)
+  const filesList = result.files.map((f) => f.name).join(', ')
+  console.log(`${buildType} built in ${formatDuration(result.duration)} - ${filesList} (${formatSize(totalSize)})`)
+}
+
 // build main bundle
-async function buildMain() {
+async function buildMain(): Promise<BuildResult> {
+  const startTime = performance.now()
   const bundle = await rolldown({
     input: buildOptions.entries.main,
     platform: 'browser',
@@ -50,12 +97,17 @@ async function buildMain() {
       propertyWriteSideEffects: false,
     },
   })
+  const outputFile = join(buildOptions.outdir, 'main.js')
   await bundle.write({
     format: 'es',
-    file: join(buildOptions.outdir, 'main.js'),
+    file: outputFile,
     inlineDynamicImports: true,
   })
   await bundle.close()
+  return {
+    duration: performance.now() - startTime,
+    files: [{ name: 'main.js', size: await getFileSize(outputFile) }],
+  }
 }
 
 // build react ui bundle
@@ -98,30 +150,46 @@ async function buildHtml(code: string, css: string) {
 }
 
 // build ui and html
-async function buildUiAndHtml() {
+async function buildUiAndHtml(): Promise<BuildResult> {
+  const startTime = performance.now()
   const { code, css } = await buildUi()
   await buildHtml(code, css)
+  return {
+    duration: performance.now() - startTime,
+    files: [{ name: 'ui.html', size: await getFileSize(join(buildOptions.outdir, 'ui.html')) }],
+  }
 }
 
 // copy manifest.json
-async function copyManifest() {
+async function copyManifest(): Promise<BuildResult> {
+  const startTime = performance.now()
   const manifest = await Bun.file(buildOptions.entries.manifest).text()
   try {
     const json = JSON.parse(manifest) as Record<string, unknown>
     json.main = 'main.js'
     json.ui = 'ui.html'
-    await Bun.write(join(buildOptions.outdir, 'manifest.json'), JSON.stringify(json, null, 2))
+    const outputFile = join(buildOptions.outdir, 'manifest.json')
+    await Bun.write(outputFile, JSON.stringify(json, null, 2))
+    return {
+      duration: performance.now() - startTime,
+      files: [{ name: 'manifest.json', size: await getFileSize(outputFile) }],
+    }
   } catch (error) {
     console.error('Malformed manifest.json:', error)
+    return {
+      duration: performance.now() - startTime,
+      files: [],
+    }
   }
 }
 
 function watchMainBuild() {
   const watcher = watch(dirname(buildOptions.entries.main), { recursive: true }, (event) => {
     if (event === 'change') {
-      console.log('Main changed, rebuilding...')
       buildMain()
-        .then(() => console.log('Main rebuilt successfully'))
+        .then((result) => {
+          printWatchInfo(result, 'Main')
+        })
         .catch((error) => {
           console.log('Error building main:', error)
         })
@@ -133,9 +201,10 @@ function watchMainBuild() {
 function watchUiBuild() {
   const watcher = watch(dirname(buildOptions.entries.ui), { recursive: true }, (event) => {
     if (event === 'change') {
-      console.log('UI changed, rebuilding...')
       buildUiAndHtml()
-        .then(() => console.log('UI rebuilt successfully'))
+        .then((result) => {
+          printWatchInfo(result, 'UI')
+        })
         .catch((error) => {
           console.log('Error building UI:', error)
         })
@@ -147,9 +216,10 @@ function watchUiBuild() {
 function watchManifest() {
   const watcher = watch(buildOptions.entries.manifest, (event) => {
     if (event === 'change') {
-      console.log('Manifest changed, copying...')
       copyManifest()
-        .then(() => console.log('Manifest copied successfully'))
+        .then((result) => {
+          printWatchInfo(result, 'Manifest')
+        })
         .catch((error) => {
           console.log('Error copying manifest:', error)
         })
@@ -159,9 +229,18 @@ function watchManifest() {
 }
 
 async function buildAll() {
-  await buildMain()
-  await buildUiAndHtml()
-  await copyManifest()
+  const startTime = performance.now()
+  const mainResult = await buildMain()
+  const uiResult = await buildUiAndHtml()
+  const manifestResult = await copyManifest()
+  const totalDuration = performance.now() - startTime
+
+  // Print concise summary
+  const allFiles = [...mainResult.files, ...uiResult.files, ...manifestResult.files]
+  printBuildSummary(allFiles, totalDuration)
+  if (buildOptions.watch) {
+    console.log('')
+  }
 }
 
 async function watchAll() {
@@ -178,14 +257,15 @@ async function watchAll() {
 
 function printHelp() {
   console.log('Usage: bun run build.ts [options]')
-  console.log('  --watch           Watch for changes and rebuild automatically (default: false)')
+  console.log('\nOptions:')
+  console.log('  --watch (-w)      Watch for changes and rebuild automatically (default: false)')
   console.log('  --main=<path>     Main entry point for the plugin (default: main/index.ts)')
   console.log('  --ui=<path>       UI entry point for the plugin (default: ui/index.tsx)')
   console.log('  --uiHtml=<path>   UI HTML entry point for the plugin (default: ui/index.html)')
   console.log('  --manifest=<path> Manifest entry point for the plugin (default: manifest.json)')
   console.log('  --outdir=<path>   Output directory (default: dist)')
-  console.log('  --help            Print this help message')
-  console.log('  --clean           Clean the dist directory')
+  console.log('  --help (-h)       Print this help message')
+  console.log('  --clean (-c)      Clean the dist directory')
 }
 
 function parseArgs() {
@@ -195,9 +275,9 @@ function parseArgs() {
     process.exit(0)
   }
   for (const arg of args) {
-    if (arg === '--clean') {
+    if (arg === '--clean' || arg === '-c') {
       buildOptions.clean = true
-    } else if (arg === '--watch') {
+    } else if (arg === '--watch' || arg === '-w') {
       buildOptions.watch = true
     } else if (arg.startsWith('--main=')) {
       buildOptions.entries.main = arg.slice(7)
