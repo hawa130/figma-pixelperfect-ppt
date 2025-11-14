@@ -5,7 +5,7 @@ import { exportFramesAsImages } from './lib/export'
 import { defaultExportSettings } from './settings'
 
 function getSelectedSlides() {
-  return figma.currentPage.selection.filter((node) => node.type === 'SLIDE').filter((node) => !node.isSkippedSlide)
+  return figma.currentPage.selection.filter((node) => node.type === 'SLIDE')
 }
 
 function getAllSlides() {

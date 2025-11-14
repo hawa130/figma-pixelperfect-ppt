@@ -1,6 +1,7 @@
-import { Button, Input, RadioGroup, Select, Text } from 'figma-kit'
+import { Button, Input, RadioGroup, Select, Text, Tooltip } from 'figma-kit'
 import { useCallback, useEffect, useState } from 'react'
 
+import { HelpIcon } from './icons/help'
 import { postMainMessage, useMainMessage, useMainMessageEvent } from './lib'
 import { downloadFile, MIME_TYPE_PPTX } from './lib/download'
 import { createPptxFromImages } from './lib/pptx'
@@ -74,11 +75,16 @@ export function Plugin() {
         <RadioGroup.Label>
           <RadioGroup.Item value="all" />
           All slides
+          <Tooltip content="Excludes skipped slides">
+            <button>
+              <HelpIcon className="size-4" />
+            </button>
+          </Tooltip>
         </RadioGroup.Label>
         <RadioGroup.Label>
           <RadioGroup.Item value="selected" />
           <div>
-            <strong>{frameCount}</strong> selected slides
+            <strong>{frameCount}</strong> selected {frameCount === 1 ? 'slide' : 'slides'}
           </div>
         </RadioGroup.Label>
       </RadioGroup.Root>
