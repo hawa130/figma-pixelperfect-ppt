@@ -5,6 +5,18 @@ function getSelectedFrames() {
   return figma.currentPage.selection.filter((node) => node.type === 'SLIDE')
 }
 
+async function handleExport() {
+  const PAGE_NUMBER_REGEX = /\d+/
+  const frames = getSelectedFrames()
+    .map((frame) => {
+      const match = frame.name.match(PAGE_NUMBER_REGEX)
+      return match ? { frame, pageNumber: parseInt(match[0], 10) } : { frame, pageNumber: 0xfffffff }
+    })
+    .sort((a, b) => a.pageNumber - b.pageNumber)
+    .map((item) => item.frame)
+  await exportFramesAsImages(frames)
+}
+
 function main() {
   figma.on('selectionchange', () => {
     const frames = getSelectedFrames()
@@ -25,8 +37,7 @@ function main() {
         break
       }
       case 'EXPORT_FRAMES_AS_IMAGES': {
-        const frames = getSelectedFrames()
-        void exportFramesAsImages(frames)
+        void handleExport()
         break
       }
       default:

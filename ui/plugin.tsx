@@ -8,7 +8,6 @@ import { createPptxFromImages } from './lib/pptx'
 export function Plugin() {
   const [frameCount, setFrameCount] = useState(0)
   const [isExporting, setIsExporting] = useState(false)
-  const [progress, setProgress] = useState<{ current: number; total: number } | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -18,13 +17,7 @@ export function Plugin() {
           setFrameCount(message.frameCount)
           setError(null)
           break
-        case 'EXPORT_PROGRESS':
-          setIsExporting(true)
-          setProgress({ current: message.current, total: message.total })
-          setError(null)
-          break
         case 'EXPORT_COMPLETE': {
-          setProgress(null)
           createPptxFromImages(message.images)
             .then((bytes) => {
               downloadFile({ filename: `frames-${Date.now()}.pptx`, bytes, mimeType: MIME_TYPE_PPTX })
@@ -39,7 +32,6 @@ export function Plugin() {
         }
         case 'EXPORT_ERROR':
           setIsExporting(false)
-          setProgress(null)
           setError(message.message)
           break
       }
@@ -50,7 +42,6 @@ export function Plugin() {
   function handleExport() {
     postMainMessage({ type: 'EXPORT_FRAMES_AS_IMAGES' })
     setIsExporting(true)
-    setProgress({ current: 0, total: frameCount })
     setError(null)
   }
 
@@ -60,11 +51,6 @@ export function Plugin() {
         <Text>
           Selected pages: <span className="font-semibold">{frameCount}</span>
         </Text>
-        {progress && (
-          <div className="text-xs text-gray-500">
-            Exporting {progress.current} of {progress.total}...
-          </div>
-        )}
         {error && <div className="rounded bg-red-50 p-2 text-xs text-red-600">{error}</div>}
       </div>
       <Button variant="primary" onClick={handleExport} disabled={frameCount === 0 || isExporting}>

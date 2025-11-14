@@ -21,22 +21,10 @@ export async function exportFramesAsImages(frames: BaseFrameMixin[]) {
   try {
     const images: ExportImageData[] = []
 
-    for (let i = 0; i < frames.length; i++) {
-      postUIMessage({
-        type: 'EXPORT_PROGRESS',
-        current: i + 1,
-        total: frames.length,
-      })
-
-      const imageData = await exportFrameAsImage(frames[i])
+    for (const frame of frames) {
+      const imageData = await exportFrameAsImage(frame)
       images.push(imageData)
     }
-
-    postUIMessage({
-      type: 'EXPORT_PROGRESS',
-      current: frames.length,
-      total: frames.length + 1,
-    })
 
     postUIMessage({
       type: 'EXPORT_COMPLETE',

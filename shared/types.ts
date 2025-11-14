@@ -9,12 +9,6 @@ interface SelectionUpdate {
   frameCount: number
 }
 
-interface ExportProgress {
-  type: 'EXPORT_PROGRESS'
-  current: number
-  total: number
-}
-
 interface ExportComplete {
   type: 'EXPORT_COMPLETE'
   images: ExportImageData[]
@@ -25,7 +19,7 @@ interface ExportError {
   message: string
 }
 
-export type MessageToUI = SelectionUpdate | ExportProgress | ExportComplete | ExportError
+export type MessageToUI = SelectionUpdate | ExportComplete | ExportError
 
 interface ExportFramesAsImagesMessage {
   type: 'EXPORT_FRAMES_AS_IMAGES'
