@@ -1,5 +1,6 @@
 import { watch } from 'fs'
-import { copyFile } from 'fs/promises'
+import { mkdir, rmdir } from 'fs/promises'
+import { dirname, join } from 'path'
 
 import tailwind from '@tailwindcss/postcss'
 import postcss from 'postcss'
@@ -8,23 +9,50 @@ import { rolldown } from 'rolldown'
 interface BuildOptions {
   // Whether to watch for changes and rebuild automatically
   watch: boolean
+  // Entries for the plugin
+  entries: {
+    // Main entry point for the plugin
+    main: string
+    // UI entry point for the plugin
+    ui: string
+    // UI HTML entry point for the plugin
+    uiHtml: string
+    // Manifest entry point for the plugin
+    manifest: string
+  }
+  // Clean the dist directory
+  clean: boolean
+  // Output directory
+  outdir: string
+}
+
+const buildOptions: BuildOptions = {
+  watch: false,
+  entries: {
+    main: 'main/index.ts',
+    ui: 'ui/index.tsx',
+    uiHtml: 'ui/index.html',
+    manifest: 'manifest.json',
+  },
+  clean: false,
+  outdir: 'dist',
 }
 
 // build main bundle
 async function buildMain() {
   const bundle = await rolldown({
-    input: 'main/index.ts',
+    input: buildOptions.entries.main,
     platform: 'browser',
     transform: {
       target: 'es2017',
     },
     treeshake: {
       propertyWriteSideEffects: false,
-    }
+    },
   })
   await bundle.write({
     format: 'es',
-    file: 'dist/main.js',
+    file: join(buildOptions.outdir, 'main.js'),
     inlineDynamicImports: true,
   })
   await bundle.close()
@@ -33,13 +61,13 @@ async function buildMain() {
 // build react ui bundle
 async function buildUi() {
   const bundle = await rolldown({
-    input: 'ui/index.tsx',
+    input: buildOptions.entries.ui,
     platform: 'browser',
   })
   const { output: uiOutput } = await bundle.generate({
     format: 'iife',
     minify: true,
-    dir: 'dist',
+    dir: buildOptions.outdir,
   })
   const code = uiOutput.find((out) => out.type === 'chunk')?.code ?? ''
   await bundle.close()
@@ -65,8 +93,8 @@ async function buildHtml(code: string, css: string) {
       },
     })
 
-  const resultHtml = rewriter.transform(await Bun.file('ui/index.html').text())
-  await Bun.write('dist/ui.html', resultHtml)
+  const resultHtml = rewriter.transform(await Bun.file(buildOptions.entries.uiHtml).text())
+  await Bun.write(join(buildOptions.outdir, 'ui.html'), resultHtml)
 }
 
 // build ui and html
@@ -77,11 +105,19 @@ async function buildUiAndHtml() {
 
 // copy manifest.json
 async function copyManifest() {
-  await copyFile('manifest.json', 'dist/manifest.json')
+  const manifest = await Bun.file(buildOptions.entries.manifest).text()
+  try {
+    const json = JSON.parse(manifest) as Record<string, unknown>
+    json.main = 'main.js'
+    json.ui = 'ui.html'
+    await Bun.write(join(buildOptions.outdir, 'manifest.json'), JSON.stringify(json, null, 2))
+  } catch (error) {
+    console.error('Malformed manifest.json:', error)
+  }
 }
 
 function watchMainBuild() {
-  const watcher = watch('main', { recursive: true }, (event) => {
+  const watcher = watch(dirname(buildOptions.entries.main), { recursive: true }, (event) => {
     if (event === 'change') {
       console.log('Main changed, rebuilding...')
       buildMain()
@@ -95,7 +131,7 @@ function watchMainBuild() {
 }
 
 function watchUiBuild() {
-  const watcher = watch('ui', { recursive: true }, (event) => {
+  const watcher = watch(dirname(buildOptions.entries.ui), { recursive: true }, (event) => {
     if (event === 'change') {
       console.log('UI changed, rebuilding...')
       buildUiAndHtml()
@@ -109,7 +145,7 @@ function watchUiBuild() {
 }
 
 function watchManifest() {
-  const watcher = watch('manifest.json', (event) => {
+  const watcher = watch(buildOptions.entries.manifest, (event) => {
     if (event === 'change') {
       console.log('Manifest changed, copying...')
       copyManifest()
@@ -140,19 +176,55 @@ async function watchAll() {
   }
 }
 
+function printHelp() {
+  console.log('Usage: bun run build.ts [options]')
+  console.log('  --watch           Watch for changes and rebuild automatically (default: false)')
+  console.log('  --main=<path>     Main entry point for the plugin (default: main/index.ts)')
+  console.log('  --ui=<path>       UI entry point for the plugin (default: ui/index.tsx)')
+  console.log('  --uiHtml=<path>   UI HTML entry point for the plugin (default: ui/index.html)')
+  console.log('  --manifest=<path> Manifest entry point for the plugin (default: manifest.json)')
+  console.log('  --outdir=<path>   Output directory (default: dist)')
+  console.log('  --help            Print this help message')
+  console.log('  --clean           Clean the dist directory')
+}
+
 function parseArgs() {
-  const initialOptions: BuildOptions = { watch: false }
   const args = process.argv.slice(2)
+  if (args.includes('--help') || args.includes('-h')) {
+    printHelp()
+    process.exit(0)
+  }
   for (const arg of args) {
-    if (arg === '--watch') {
-      initialOptions.watch = true
+    if (arg === '--clean') {
+      buildOptions.clean = true
+    } else if (arg === '--watch') {
+      buildOptions.watch = true
+    } else if (arg.startsWith('--main=')) {
+      buildOptions.entries.main = arg.slice(7)
+    } else if (arg.startsWith('--ui=')) {
+      buildOptions.entries.ui = arg.slice(5)
+    } else if (arg.startsWith('--uiHtml=')) {
+      buildOptions.entries.uiHtml = arg.slice(9)
+    } else if (arg.startsWith('--manifest=')) {
+      buildOptions.entries.manifest = arg.slice(11)
+    } else if (arg.startsWith('--outdir=')) {
+      buildOptions.outdir = arg.slice(9)
     }
   }
-  return initialOptions
+  return buildOptions
+}
+
+async function cleanDist() {
+  await rmdir(buildOptions.outdir, { recursive: true })
+  await mkdir(buildOptions.outdir)
 }
 
 async function main() {
   const args = parseArgs()
+  if (args.clean) {
+    await cleanDist()
+    return
+  }
   if (args.watch) {
     console.log('Watching for changes...')
     const unwatch = await watchAll()
