@@ -5,11 +5,14 @@ import { exportFramesAsImages } from './lib/export'
 import { defaultExportSettings } from './settings'
 
 function getSelectedSlides() {
-  return figma.currentPage.selection.filter((node) => node.type === 'SLIDE')
+  return figma.currentPage.selection.filter((node) => node.type === 'SLIDE').filter((node) => !node.isSkippedSlide)
 }
 
 function getAllSlides() {
-  return figma.currentPage.findAll().filter((node) => node.type === 'SLIDE')
+  return figma.currentPage
+    .findAll()
+    .filter((node) => node.type === 'SLIDE')
+    .filter((node) => !node.isSkippedSlide)
 }
 
 async function handleExport(mode: 'selected' | 'all' = 'all', settings?: ExportSettings) {

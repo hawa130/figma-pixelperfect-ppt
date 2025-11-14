@@ -93,14 +93,25 @@ export function Plugin() {
           />
           <span className="fp-ValueFieldLabel w-auto! pr-1.5">.pptx</span>
         </label>
-        <Text className="text-text-secondary!">Scale</Text>
+        <Text className="text-text-secondary!">Quality</Text>
         <Select.Root value={scale} onValueChange={setScale}>
           <Select.Trigger />
           <Select.Content>
-            <Select.Item value="1">1x</Select.Item>
-            <Select.Item value="2">2x</Select.Item>
-            <Select.Item value="3">3x</Select.Item>
-            <Select.Item value="4">4x</Select.Item>
+            <Select.Item value="1">
+              1x<span className="ml-1 opacity-60">Standard</span>
+            </Select.Item>
+            <Select.Item value="1.5">
+              1.5x<span className="ml-1 opacity-60">Balanced</span>
+            </Select.Item>
+            <Select.Item value="2">
+              2x<span className="ml-1 opacity-60">High</span>
+            </Select.Item>
+            <Select.Item value="3">
+              3x<span className="ml-1 opacity-60">Ultra High</span>
+            </Select.Item>
+            <Select.Item value="4">
+              4x<span className="ml-1 opacity-60">Insane</span>
+            </Select.Item>
           </Select.Content>
         </Select.Root>
       </div>
