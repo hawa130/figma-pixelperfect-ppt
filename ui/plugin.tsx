@@ -88,7 +88,7 @@ export function Plugin() {
           </div>
         </RadioGroup.Label>
       </RadioGroup.Root>
-      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2 py-1">
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2 py-1">
         <Text className="text-text-secondary!">Name</Text>
         <label className="fp-ValueFieldRoot">
           <Input
