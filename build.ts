@@ -15,6 +15,9 @@ async function buildMain() {
   const bundle = await rolldown({
     input: 'main/index.ts',
     platform: 'browser',
+    transform: {
+      target: 'es2017',
+    },
   })
   await bundle.write({
     format: 'es',

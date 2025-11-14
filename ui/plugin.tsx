@@ -11,30 +11,25 @@ export function Plugin() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    onMainMessage((message) => {
-      switch (message.type) {
-        case 'selection_update':
-          setFrameCount(message.frameCount)
-          setError(null)
-          break
-        case 'export_complete': {
-          createPptxFromImages(message.images)
-            .then((bytes) => {
-              downloadFile({ filename: `frames-${Date.now()}.pptx`, bytes, mimeType: MIME_TYPE_PPTX })
-            })
-            .catch((error) => {
-              setError(error instanceof Error ? error.message : 'Unknown error')
-            })
-            .finally(() => {
-              setIsExporting(false)
-            })
-          break
-        }
-        case 'export_error':
+    onMainMessage('selection_update', (message) => {
+      setFrameCount(message.frameCount)
+      setError(null)
+    })
+    onMainMessage('export_complete', (message) => {
+      createPptxFromImages(message.images)
+        .then((bytes) => {
+          downloadFile({ filename: `frames-${Date.now()}.pptx`, bytes, mimeType: MIME_TYPE_PPTX })
+        })
+        .catch((error) => {
+          setError(error instanceof Error ? error.message : 'Unknown error')
+        })
+        .finally(() => {
           setIsExporting(false)
-          setError(message.message)
-          break
-      }
+        })
+    })
+    onMainMessage('export_error', (message) => {
+      setIsExporting(false)
+      setError(message.message)
     })
     postMainMessage({ type: 'query_selection' })
   }, [])

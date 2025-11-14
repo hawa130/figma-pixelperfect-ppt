@@ -25,23 +25,16 @@ function main() {
     })
   })
 
-  onUIMessage((message) => {
-    switch (message.type) {
-      case 'query_selection': {
-        const frames = getSelectedFrames()
-        postUIMessage({
-          type: 'selection_update',
-          frameCount: frames.length,
-        })
-        break
-      }
-      case 'export_frames_as_images': {
-        void handleExport()
-        break
-      }
-      default:
-        break
-    }
+  onUIMessage('query_selection', () => {
+    const frames = getSelectedFrames()
+    postUIMessage({
+      type: 'selection_update',
+      frameCount: frames.length,
+    })
+  })
+
+  onUIMessage('export_frames_as_images', () => {
+    void handleExport()
   })
 
   figma.showUI(__html__, {
