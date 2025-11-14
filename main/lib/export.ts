@@ -1,15 +1,19 @@
-import type { ExportImageData } from '../shared/types'
-import { postUIMessage } from './lib'
+import { postUIMessage } from '.'
+import type { ExportImageData } from '../../shared/types'
+import { defaultExportSettings } from '../settings'
 
-async function exportFrameAsImage(frame: BaseFrameMixin): Promise<ExportImageData> {
-  const bytes = (await frame.exportAsync({
-    format: 'PNG',
-    constraint: { type: 'SCALE', value: 2 },
-  })) as Uint8Array<ArrayBuffer>
+async function exportFrameAsImage(
+  frame: BaseFrameMixin,
+  exportSettings: ExportSettings = defaultExportSettings,
+): Promise<ExportImageData> {
+  const bytes = (await frame.exportAsync(exportSettings)) as Uint8Array<ArrayBuffer>
   return { bytes, width: frame.width, height: frame.height }
 }
 
-export async function exportFramesAsImages(frames: BaseFrameMixin[]) {
+export async function exportFramesAsImages(
+  frames: BaseFrameMixin[],
+  exportSettings: ExportSettings = defaultExportSettings,
+) {
   if (frames.length === 0) {
     postUIMessage({
       type: 'export_error',
@@ -22,7 +26,7 @@ export async function exportFramesAsImages(frames: BaseFrameMixin[]) {
     const images: ExportImageData[] = []
 
     for (const frame of frames) {
-      const imageData = await exportFrameAsImage(frame)
+      const imageData = await exportFrameAsImage(frame, exportSettings)
       images.push(imageData)
     }
 
@@ -34,6 +38,7 @@ export async function exportFramesAsImages(frames: BaseFrameMixin[]) {
     figma.notify(`Exported ${frames.length} frame(s) to PPTX`)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Export failed'
+    figma.notify(message, { error: true })
     postUIMessage({
       type: 'export_error',
       message,

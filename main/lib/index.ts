@@ -1,4 +1,4 @@
-import type { MessageFromUI, MessageToUI } from '../shared/types'
+import type { MessageFromUI, MessageToUI } from '../../shared/types'
 
 const messageListener = new Map<
   MessageFromUI['type'],

@@ -1,24 +1,32 @@
-import { exportFramesAsImages } from './export'
-import { onUIMessage, postUIMessage } from './lib'
+import { assign } from 'radashi'
 
-function getSelectedFrames() {
+import { onUIMessage, postUIMessage } from './lib'
+import { exportFramesAsImages } from './lib/export'
+import { defaultExportSettings } from './settings'
+
+function getSelectedSlides() {
   return figma.currentPage.selection.filter((node) => node.type === 'SLIDE')
 }
 
-async function handleExport() {
-  const frames = getSelectedFrames()
+function getAllSlides() {
+  return figma.currentPage.findAll().filter((node) => node.type === 'SLIDE')
+}
+
+async function handleExport(mode: 'selected' | 'all' = 'all', settings?: ExportSettings) {
+  const slides = mode === 'selected' ? getSelectedSlides() : getAllSlides()
+  const frames = slides
     .map((frame) => {
       const match = frame.name.match(/\d+/)
       return match ? { frame, pageNumber: parseInt(match[0], 10) } : { frame, pageNumber: 0xfffffff }
     })
     .sort((a, b) => a.pageNumber - b.pageNumber)
     .map((item) => item.frame)
-  await exportFramesAsImages(frames)
+  await exportFramesAsImages(frames, settings)
 }
 
 function main() {
   figma.on('selectionchange', () => {
-    const frames = getSelectedFrames()
+    const frames = getSelectedSlides()
     postUIMessage({
       type: 'selection_update',
       frameCount: frames.length,
@@ -26,21 +34,28 @@ function main() {
   })
 
   onUIMessage('query_selection', () => {
-    const frames = getSelectedFrames()
+    const frames = getSelectedSlides()
     postUIMessage({
       type: 'selection_update',
       frameCount: frames.length,
     })
   })
 
-  onUIMessage('export_frames_as_images', () => {
-    void handleExport()
+  onUIMessage('export_frames_as_images', (message) => {
+    void handleExport(message.mode, assign(defaultExportSettings, message.settings) as ExportSettings)
+  })
+
+  onUIMessage('query_filename', () => {
+    postUIMessage({
+      type: 'filename_update',
+      filename: figma.root.name,
+    })
   })
 
   figma.showUI(__html__, {
     themeColors: true,
     width: 228,
-    height: 100,
+    height: 200,
   })
 }
 
