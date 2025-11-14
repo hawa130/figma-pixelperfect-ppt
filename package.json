@@ -1,12 +1,12 @@
 {
-  "name": "Figma-to-Image-PPT",
+  "name": "pixelperfect-ppt",
   "version": "1.0.0",
-  "description": "Convert Figma to Image PPT",
+  "description": "Convert Figma to pixel perfect PPT",
   "main": "code.js",
   "type": "module",
   "scripts": {
     "build": "bun run build.ts",
-    "watch": "bun run build.ts --watch",
+    "dev": "bun run build.ts --watch",
     "lint": "eslint",
     "fmt": "prettier --write .",
     "check": "tsc --noEmit"
