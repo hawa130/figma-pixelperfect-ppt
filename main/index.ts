@@ -1,74 +1,44 @@
-// This file holds the main code for plugins. Code in this file has access to
-// the *figma document* via the figma global object.
-// You can access browser APIs in the <script> tag inside "ui.html" which has a
-// full browser environment (See https://www.figma.com/plugin-docs/how-plugins-run).
+import { exportFramesAsImages } from './export'
+import { onUIMessage, postUIMessage } from './lib'
 
-// Runs this code if the plugin is run in Figma
-if (figma.editorType === 'figma') {
-  // This plugin will open a window to prompt the user to enter a number, and
-  // it will then create that many rectangles on the screen.
-
-  // This shows the HTML page in "ui.html".
-  figma.showUI(__html__, { themeColors: true })
-
-  // Calls to "parent.postMessage" from within the HTML page will trigger this
-  // callback. The callback will be passed the "pluginMessage" property of the
-  // posted message.
-  figma.ui.onmessage = (msg: { type: string; count: number }) => {
-    // One way of distinguishing between different types of messages sent from
-    // your HTML page is to use an object with a "type" property like this.
-    if (msg.type === 'create-shapes') {
-      // This plugin creates rectangles on the screen.
-      const numberOfRectangles = msg.count
-
-      const nodes: SceneNode[] = []
-      for (let i = 0; i < numberOfRectangles; i++) {
-        const rect = figma.createRectangle()
-        rect.x = i * 150
-        rect.fills = [{ type: 'SOLID', color: { r: 1, g: 0.5, b: 0 } }]
-        figma.currentPage.appendChild(rect)
-        nodes.push(rect)
-      }
-      figma.currentPage.selection = nodes
-      figma.viewport.scrollAndZoomIntoView(nodes)
-    }
-
-    // Make sure to close the plugin when you're done. Otherwise the plugin will
-    // keep running, which shows the cancel button at the bottom of the screen.
-    figma.closePlugin()
-  }
+function getSelectedFrames(): (FrameNode | SlideNode)[] {
+  return figma.currentPage.selection.filter((node) => node.type === 'FRAME' || node.type === 'SLIDE')
 }
 
-// Runs this code if the plugin is run in Slides
-if (figma.editorType === 'slides') {
-  // This plugin will open a window to prompt the user to enter a number, and
-  // it will then create that many slides on the screen.
+function main() {
+  figma.on('selectionchange', () => {
+    const frames = getSelectedFrames()
+    postUIMessage({
+      type: 'SELECTION_UPDATE',
+      frameCount: frames.length,
+    })
+  })
 
-  // This shows the HTML page in "ui.html".
-  figma.showUI(__html__, { themeColors: true })
-
-  // Calls to "parent.postMessage" from within the HTML page will trigger this
-  // callback. The callback will be passed the "pluginMessage" property of the
-  // posted message.
-  figma.ui.onmessage = (msg: { type: string; count: number }) => {
-    // One way of distinguishing between different types of messages sent from
-    // your HTML page is to use an object with a "type" property like this.
-    if (msg.type === 'create-shapes') {
-      // This plugin creates slides and puts the user in grid view.
-      const numberOfSlides = msg.count
-
-      const nodes: SlideNode[] = []
-      for (let i = 0; i < numberOfSlides; i++) {
-        const slide = figma.createSlide()
-        nodes.push(slide)
+  onUIMessage((message) => {
+    switch (message.type) {
+      case 'QUERY_SELECTION': {
+        const frames = getSelectedFrames()
+        postUIMessage({
+          type: 'SELECTION_UPDATE',
+          frameCount: frames.length,
+        })
+        break
       }
-
-      figma.viewport.slidesView = 'grid'
-      figma.currentPage.selection = nodes
+      case 'EXPORT_FRAMES_AS_IMAGES': {
+        const frames = getSelectedFrames()
+        void exportFramesAsImages(frames)
+        break
+      }
+      default:
+        break
     }
+  })
 
-    // Make sure to close the plugin when you're done. Otherwise the plugin will
-    // keep running, which shows the cancel button at the bottom of the screen.
-    figma.closePlugin()
-  }
+  figma.showUI(__html__, {
+    themeColors: true,
+    width: 228,
+    height: 100,
+  })
 }
+
+main()

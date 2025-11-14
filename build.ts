@@ -19,6 +19,7 @@ async function buildMain() {
   await bundle.write({
     format: 'es',
     file: 'dist/main.js',
+    inlineDynamicImports: true,
   })
   await bundle.close()
 }
