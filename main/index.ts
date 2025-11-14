@@ -1,8 +1,8 @@
 import { exportFramesAsImages } from './export'
 import { onUIMessage, postUIMessage } from './lib'
 
-function getSelectedFrames(): (FrameNode | SlideNode)[] {
-  return figma.currentPage.selection.filter((node) => node.type === 'FRAME' || node.type === 'SLIDE')
+function getSelectedFrames() {
+  return figma.currentPage.selection.filter((node) => node.type === 'SLIDE')
 }
 
 function main() {

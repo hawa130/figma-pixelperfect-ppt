@@ -1,7 +1,7 @@
 import type { ExportImageData } from '../shared/types'
 import { postUIMessage } from './lib'
 
-async function exportFrameAsImage(frame: FrameNode | SlideNode): Promise<ExportImageData> {
+async function exportFrameAsImage(frame: BaseFrameMixin): Promise<ExportImageData> {
   const bytes = (await frame.exportAsync({
     format: 'PNG',
     constraint: { type: 'SCALE', value: 2 },
@@ -9,7 +9,7 @@ async function exportFrameAsImage(frame: FrameNode | SlideNode): Promise<ExportI
   return { bytes, width: frame.width, height: frame.height }
 }
 
-export async function exportFramesAsImages(frames: (FrameNode | SlideNode)[]) {
+export async function exportFramesAsImages(frames: BaseFrameMixin[]) {
   if (frames.length === 0) {
     postUIMessage({
       type: 'EXPORT_ERROR',
