@@ -2,7 +2,7 @@ import type { MessageFromUI, MessageToUI } from '../shared/types'
 
 const messageListener = new Map<
   MessageFromUI['type'],
-  ((message: MessageFromUI, props: OnMessageProperties) => void)[]
+  Set<(message: MessageFromUI, props: OnMessageProperties) => void>
 >()
 
 figma.ui.onmessage = (message: MessageFromUI, props) => {
@@ -19,10 +19,22 @@ type MessageByType<TType extends MessageFromUI['type']> = Extract<MessageFromUI,
 export function onUIMessage<TType extends MessageFromUI['type']>(
   type: TType,
   handler: (message: MessageByType<TType>, props: OnMessageProperties) => void,
-) {
-  const listeners = messageListener.get(type) ?? []
-  listeners.push((message, props) => handler(message as MessageByType<TType>, props))
+): () => void {
+  const listeners = messageListener.get(type) ?? new Set()
+  const wrappedHandler = (message: MessageFromUI, props: OnMessageProperties) =>
+    handler(message as MessageByType<TType>, props)
+  listeners.add(wrappedHandler)
   messageListener.set(type, listeners)
+
+  return () => {
+    const currentListeners = messageListener.get(type)
+    if (currentListeners) {
+      currentListeners.delete(wrappedHandler)
+      if (currentListeners.size === 0) {
+        messageListener.delete(type)
+      }
+    }
+  }
 }
 
 export function postUIMessage(message: MessageToUI, options?: UIPostMessageOptions) {

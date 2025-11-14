@@ -1,6 +1,8 @@
+import { useEffect } from 'react'
+
 import type { MessageFromUI, MessageToUI } from '../../shared/types'
 
-const messageListener = new Map<MessageToUI['type'], ((message: MessageToUI) => void)[]>()
+const messageListener = new Map<MessageToUI['type'], Set<(message: MessageToUI) => void>>()
 
 onmessage = (event) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -21,10 +23,41 @@ type MessageByType<TType extends MessageToUI['type']> = Extract<MessageToUI, { t
 export function onMainMessage<TType extends MessageToUI['type']>(
   type: TType,
   handler: (message: MessageByType<TType>) => void,
-) {
-  const listeners = messageListener.get(type) ?? []
-  listeners.push((message) => handler(message as MessageByType<TType>))
+): () => void {
+  const listeners = messageListener.get(type) ?? new Set()
+  const wrappedHandler = (message: MessageToUI) => handler(message as MessageByType<TType>)
+  listeners.add(wrappedHandler)
   messageListener.set(type, listeners)
+
+  return () => {
+    const currentListeners = messageListener.get(type)
+    if (currentListeners) {
+      currentListeners.delete(wrappedHandler)
+      if (currentListeners.size === 0) {
+        messageListener.delete(type)
+      }
+    }
+  }
+}
+
+export function useMainMessage<TType extends MessageToUI['type']>(
+  type: TType,
+  handler: (message: MessageByType<TType>) => void,
+) {
+  useEffect(() => {
+    const unregister = onMainMessage(type, handler)
+    return () => unregister()
+  }, [type, handler])
+}
+
+export function useMainMessageEvent<TType extends MessageToUI['type']>(
+  type: TType,
+  handler: (message: MessageByType<TType>) => void,
+) {
+  useEffect(() => {
+    const unregister = onMainMessage(type, handler)
+    return () => unregister()
+  }, [type]) // Handler is non-reactive, no need to add to dependencies
 }
 
 export function postMainMessage(message: MessageFromUI) {

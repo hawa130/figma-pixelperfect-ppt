@@ -1,7 +1,7 @@
 import { Button, Text } from 'figma-kit'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
-import { onMainMessage, postMainMessage } from './lib'
+import { postMainMessage, useMainMessageEvent } from './lib'
 import { downloadFile, MIME_TYPE_PPTX } from './lib/download'
 import { createPptxFromImages } from './lib/pptx'
 
@@ -10,29 +10,28 @@ export function Plugin() {
   const [isExporting, setIsExporting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    onMainMessage('selection_update', (message) => {
-      setFrameCount(message.frameCount)
-      setError(null)
-    })
-    onMainMessage('export_complete', (message) => {
-      createPptxFromImages(message.images)
-        .then((bytes) => {
-          downloadFile({ filename: `frames-${Date.now()}.pptx`, bytes, mimeType: MIME_TYPE_PPTX })
-        })
-        .catch((error) => {
-          setError(error instanceof Error ? error.message : 'Unknown error')
-        })
-        .finally(() => {
-          setIsExporting(false)
-        })
-    })
-    onMainMessage('export_error', (message) => {
-      setIsExporting(false)
-      setError(message.message)
-    })
-    postMainMessage({ type: 'query_selection' })
-  }, [])
+  useMainMessageEvent('selection_update', (message) => {
+    setFrameCount(message.frameCount)
+    setError(null)
+  })
+
+  useMainMessageEvent('export_complete', (message) => {
+    createPptxFromImages(message.images)
+      .then((bytes) => {
+        downloadFile({ filename: `frames-${Date.now()}.pptx`, bytes, mimeType: MIME_TYPE_PPTX })
+      })
+      .catch((error) => {
+        setError(error instanceof Error ? error.message : 'Unknown error')
+      })
+      .finally(() => {
+        setIsExporting(false)
+      })
+  })
+
+  useMainMessageEvent('export_error', (message) => {
+    setIsExporting(false)
+    setError(message.message)
+  })
 
   function handleExport() {
     postMainMessage({ type: 'export_frames_as_images' })
