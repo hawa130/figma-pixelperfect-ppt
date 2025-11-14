@@ -35,7 +35,7 @@ export async function exportFramesAsImages(
       images,
     })
 
-    figma.notify(`Exported ${frames.length} frame(s) to PPTX`)
+    figma.notify(`Exported ${frames.length} frame${frames.length > 1 ? 's' : ''} to PPTX`)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Export failed'
     figma.notify(message, { error: true })
