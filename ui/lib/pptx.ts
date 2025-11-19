@@ -3,13 +3,13 @@ import PptxGenJS from 'pptxgenjs'
 import type { ExportImageData } from '../../shared/types'
 import { uint8ArrayToBase64 } from './utils'
 
-const INCHES_PER_PIXEL = 1 / 96
+const INCHES_PER_PIXEL = 1 / 192
 
 function pixelsToInches(pixels: number): number {
   return pixels * INCHES_PER_PIXEL
 }
 
-export async function createPptxFromImages(images: ExportImageData[]): Promise<Uint8Array<ArrayBuffer>> {
+export async function createPptxFromImages(images: ExportImageData[]): Promise<Blob> {
   if (images.length === 0) {
     throw new Error('No images provided')
   }
@@ -29,19 +29,12 @@ export async function createPptxFromImages(images: ExportImageData[]): Promise<U
   pptx.layout = 'custom'
 
   for (const image of images) {
-    const slide = pptx.addSlide()
+    const slide = pptx.addSlide({ masterName: 'custom' })
     const base64 = uint8ArrayToBase64(image.bytes)
     slide.background = {
       data: `image/png;base64,${base64}`,
     }
   }
 
-  const result = await pptx.write({ outputType: 'uint8array' })
-  if (result instanceof Uint8Array) {
-    return result as Uint8Array<ArrayBuffer>
-  }
-  if (result instanceof ArrayBuffer) {
-    return new Uint8Array(result)
-  }
-  throw new Error('Unexpected return type from pptx.write()')
+  return (await pptx.write({ outputType: 'blob', compression: true })) as Blob
 }

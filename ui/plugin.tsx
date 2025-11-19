@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { HelpIcon } from './icons/help'
 import { postMainMessage, useMainMessage, useMainMessageEvent } from './lib'
-import { downloadFile, MIME_TYPE_PPTX } from './lib/download'
+import { downloadFile } from './lib/download'
 import { createPptxFromImages } from './lib/pptx'
 
 export function Plugin() {
@@ -25,8 +25,8 @@ export function Plugin() {
     useCallback(
       (message) => {
         createPptxFromImages(message.images)
-          .then((bytes) => {
-            downloadFile({ filename: `${filename}.pptx`, bytes, mimeType: MIME_TYPE_PPTX })
+          .then((blob) => {
+            downloadFile({ filename: `${filename}.pptx`, blob })
           })
           .catch((error) => {
             setError(error instanceof Error ? error.message : 'Unknown error')

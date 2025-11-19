@@ -1,5 +1,5 @@
 export interface ExportImageData {
-  bytes: Uint8Array<ArrayBuffer>
+  bytes: Uint8Array
   width: number
   height: number
 }

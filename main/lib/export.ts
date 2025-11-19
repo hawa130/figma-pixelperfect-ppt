@@ -6,7 +6,7 @@ async function exportFrameAsImage(
   frame: BaseFrameMixin,
   exportSettings: ExportSettings = defaultExportSettings,
 ): Promise<ExportImageData> {
-  const bytes = (await frame.exportAsync(exportSettings)) as Uint8Array<ArrayBuffer>
+  const bytes = await frame.exportAsync(exportSettings)
   return { bytes, width: frame.width, height: frame.height }
 }
 
@@ -35,7 +35,7 @@ export async function exportFramesAsImages(
       images,
     })
 
-    figma.notify(`Exported ${frames.length} frame${frames.length > 1 ? 's' : ''} to PPTX`)
+    figma.notify(`Exported ${frames.length} slide${frames.length > 1 ? 's' : ''} to PPTX`)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Export failed'
     figma.notify(message, { error: true })
