@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 
 import type { MessageFromUI, MessageToUI } from '../../shared/types'
 
-const messageListener = new Map<MessageToUI['type'], Set<(message: MessageToUI) => void>>()
+const messageListener = new Map<MessageToUI['type'], Set<(message: MessageToUI) => void | Promise<void>>>()
 
 onmessage = (event) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -14,7 +14,7 @@ onmessage = (event) => {
   const listeners = messageListener.get(message.type)
   if (listeners) {
     for (const listener of listeners) {
-      listener(message)
+      void listener(message)
     }
   }
 }
@@ -22,7 +22,7 @@ onmessage = (event) => {
 type MessageByType<TType extends MessageToUI['type']> = Extract<MessageToUI, { type: TType }>
 export function onMainMessage<TType extends MessageToUI['type']>(
   type: TType,
-  handler: (message: MessageByType<TType>) => void,
+  handler: (message: MessageByType<TType>) => void | Promise<void>,
 ): () => void {
   const listeners = messageListener.get(type) ?? new Set()
   const wrappedHandler = (message: MessageToUI) => handler(message as MessageByType<TType>)
@@ -42,7 +42,7 @@ export function onMainMessage<TType extends MessageToUI['type']>(
 
 export function useMainMessage<TType extends MessageToUI['type']>(
   type: TType,
-  handler: (message: MessageByType<TType>) => void,
+  handler: (message: MessageByType<TType>) => void | Promise<void>,
 ) {
   useEffect(() => {
     const unregister = onMainMessage(type, handler)

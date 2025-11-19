@@ -2,14 +2,14 @@ import type { MessageFromUI, MessageToUI } from '../../shared/types'
 
 const messageListener = new Map<
   MessageFromUI['type'],
-  Set<(message: MessageFromUI, props: OnMessageProperties) => void>
+  Set<(message: MessageFromUI, props: OnMessageProperties) => void | Promise<void>>
 >()
 
 figma.ui.onmessage = (message: MessageFromUI, props) => {
   const listeners = messageListener.get(message.type)
   if (listeners) {
     for (const listener of listeners) {
-      listener(message, props)
+      void listener(message, props)
     }
   }
 }
@@ -18,7 +18,7 @@ type MessageByType<TType extends MessageFromUI['type']> = Extract<MessageFromUI,
 
 export function onUIMessage<TType extends MessageFromUI['type']>(
   type: TType,
-  handler: (message: MessageByType<TType>, props: OnMessageProperties) => void,
+  handler: (message: MessageByType<TType>, props: OnMessageProperties) => void | Promise<void>,
 ): () => void {
   const listeners = messageListener.get(type) ?? new Set()
   const wrappedHandler = (message: MessageFromUI, props: OnMessageProperties) =>
