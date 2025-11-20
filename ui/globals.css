@@ -168,10 +168,22 @@
   --color-border-oncomponent-strong: var(--figma-color-border-oncomponent-strong);
   --color-border-onselected: var(--figma-color-border-onselected);
   --color-border-onselected-strong: var(--figma-color-border-onselected-strong);
+
+  /* radius */
+  --radius-xs: 0.0625rem;
+  --radius-sm: 0.125rem;
+  --radius-md: 0.3125rem;
+  --radius-lg: 0.8125rem;
+  --radius: var(--radius-sm);
 }
 
 body {
   @apply antialiased;
-  background-color: var(--figma-color-bg);
-  color: var(--figma-color-text);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-family-default);
+  font-size: var(--font-size-default);
+  line-height: var(--line-height-3);
+  letter-spacing: var(--letter-spacing-3);
+  font-weight: var(--font-weight-default);
 }
