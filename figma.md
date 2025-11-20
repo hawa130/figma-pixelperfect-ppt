@@ -43,4 +43,3 @@ Perfect for designers who need to share Figma Slides in PowerPoint while maintai
 5. 点击"Export to PPTX"
 
 非常适合需要在 PowerPoint 中分享 Figma Slides 并保持完美视觉保真度的设计师。
-
