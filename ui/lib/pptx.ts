@@ -11,7 +11,7 @@ function pixelsToInches(pixels: number): number {
 
 export async function createPptxFromImages(images: ExportImageData[]): Promise<Blob> {
   if (images.length === 0) {
-    throw new Error('No images provided')
+    throw new Error('No slides to export')
   }
 
   const maxWidth = Math.max(...images.map((img) => img.width))

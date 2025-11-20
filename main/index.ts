@@ -2,20 +2,11 @@ import { assign } from 'radashi'
 
 import { onUIMessage, postUIMessage } from './lib'
 import { exportFramesAsImages } from './lib/export'
+import { getAllSlides, getSelectedSlides } from './lib/get-slides'
+import { createTask } from './lib/task'
 import { defaultExportSettings } from './settings'
 
-function getSelectedSlides() {
-  return figma.currentPage.selection.filter((node) => node.type === 'SLIDE')
-}
-
-function getAllSlides() {
-  return figma.currentPage
-    .findAll()
-    .filter((node) => node.type === 'SLIDE')
-    .filter((node) => !node.isSkippedSlide)
-}
-
-async function handleExport(mode: 'selected' | 'all' = 'all', settings?: ExportSettings) {
+const exportTask = createTask(async (signal, mode: 'selected' | 'all' = 'all', settings?: ExportSettings) => {
   const slides = mode === 'selected' ? getSelectedSlides() : getAllSlides()
   const frames = slides
     .map((frame) => {
@@ -24,8 +15,9 @@ async function handleExport(mode: 'selected' | 'all' = 'all', settings?: ExportS
     })
     .sort((a, b) => a.pageNumber - b.pageNumber)
     .map((item) => item.frame)
-  await exportFramesAsImages(frames, settings)
-}
+
+  return await exportFramesAsImages(frames, settings, { signal })
+})
 
 function main() {
   figma.on('selectionchange', () => {
@@ -44,8 +36,12 @@ function main() {
     })
   })
 
-  onUIMessage('export_frames_as_images', (message) => {
-    void handleExport(message.mode, assign(defaultExportSettings, message.settings) as ExportSettings)
+  onUIMessage('export_frames_as_images', async (message) => {
+    await exportTask.execute(message.mode, assign(defaultExportSettings, message.settings) as ExportSettings)
+  })
+
+  onUIMessage('cancel_export', () => {
+    exportTask.cancel()
   })
 
   onUIMessage('query_filename', () => {
@@ -57,8 +53,8 @@ function main() {
 
   figma.showUI(__html__, {
     themeColors: true,
-    width: 220,
-    height: 200,
+    width: 240,
+    height: 208,
   })
 }
 

@@ -1,4 +1,4 @@
-import { Button, Input, RadioGroup, Select, Text, Tooltip } from 'figma-kit'
+import { Button, Input, RadioGroup, Select, Tooltip } from 'figma-kit'
 import { useCallback, useEffect, useState } from 'react'
 
 import { HelpIcon } from './icons/help'
@@ -9,39 +9,47 @@ import { createPptxFromImages } from './lib/pptx'
 export function Plugin() {
   const [frameCount, setFrameCount] = useState(0)
   const [isExporting, setIsExporting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
   const [filename, setFilename] = useState('Slides')
   const [scale, setScale] = useState('2')
   const [mode, setMode] = useState<'selected' | 'all'>('all')
+  const [message, setMessage] = useState<string | Error | null>(null)
 
   useMainMessageEvent('selection_update', (message) => {
     setFrameCount(message.frameCount)
-    setError(null)
   })
 
   useMainMessage(
     'export_complete',
     useCallback(
-      (message) => {
-        createPptxFromImages(message.images)
-          .then((blob) => {
-            downloadFile({ filename: `${filename}.pptx`, blob })
-          })
-          .catch((error) => {
-            setError(error instanceof Error ? error.message : 'Unknown error')
-          })
-          .finally(() => {
-            setIsExporting(false)
-          })
+      async (message) => {
+        setMessage('Creating PPTX file...')
+        try {
+          const blob = await createPptxFromImages(message.images)
+          downloadFile({ filename: `${filename}.pptx`, blob })
+        } catch (error) {
+          setMessage(error instanceof Error ? error : new Error('An unexpected error occurred'))
+        } finally {
+          setMessage(null)
+          setIsExporting(false)
+        }
       },
       [filename],
     ),
   )
 
-  useMainMessageEvent('export_error', (message) => {
+  useMainMessageEvent('export_progress', (message) => {
+    setIsExporting(true)
+    setMessage(`Exporting slide ${message.current} of ${message.total}`)
+  })
+
+  useMainMessageEvent('export_cancelled', () => {
     setIsExporting(false)
-    setError(message.message)
+    setMessage(null)
+  })
+
+  useMainMessageEvent('export_error', (error) => {
+    setIsExporting(false)
+    setMessage(new Error(error.message))
   })
 
   useMainMessageEvent('filename_update', (message) => {
@@ -59,8 +67,8 @@ export function Plugin() {
       mode,
       settings: { constraint: { value: parseFloat(scale), type: 'SCALE' } },
     })
+    setMessage(null)
     setIsExporting(true)
-    setError(null)
   }
 
   const canExport = frameCount > 0 || mode === 'all'
@@ -75,7 +83,7 @@ export function Plugin() {
         <RadioGroup.Label>
           <RadioGroup.Item value="all" />
           All slides
-          <Tooltip content="Excludes skipped slides">
+          <Tooltip content="Skipped slides are excluded">
             <button>
               <HelpIcon className="size-4" />
             </button>
@@ -89,7 +97,7 @@ export function Plugin() {
         </RadioGroup.Label>
       </RadioGroup.Root>
       <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2 py-1">
-        <Text className="text-text-secondary!">Name</Text>
+        <label className="text-text-secondary">File name</label>
         <label className="fp-ValueFieldRoot">
           <Input
             selectOnClick
@@ -99,7 +107,7 @@ export function Plugin() {
           />
           <span className="fp-ValueFieldLabel w-auto! pr-1.5">.pptx</span>
         </label>
-        <Text className="text-text-secondary!">Quality</Text>
+        <label className="text-text-secondary">Quality</label>
         <Select.Root value={scale} onValueChange={setScale}>
           <Select.Trigger />
           <Select.Content>
@@ -116,25 +124,46 @@ export function Plugin() {
               3x<span className="ml-1 opacity-60">Ultra High</span>
             </Select.Item>
             <Select.Item value="4">
-              4x<span className="ml-1 opacity-60">Insane</span>
+              4x<span className="ml-1 opacity-60">Maximum</span>
             </Select.Item>
           </Select.Content>
         </Select.Root>
       </div>
-      {error && <div className="rounded bg-red-50 p-2 text-xs text-red-600">{error}</div>}
-      <div className="flex flex-1 flex-col justify-end">
-        <div className="flex items-center justify-end">
-          <Button variant="primary" onClick={handleExport} disabled={!canExport || isExporting}>
-            {!canExport ? (
-              <span className="text-text-tertiary">Select slides to export</span>
-            ) : isExporting ? (
-              'Exporting...'
-            ) : (
-              'Export to PPTX'
-            )}
-          </Button>
+
+      {!canExport && <div className="text-text-danger">Please select slides to export</div>}
+      {message instanceof Error && <div className="text-text-danger">{message.message}</div>}
+
+      <div className="flex flex-1 flex-col justify-end gap-2">
+        <div className="flex items-end">
+          <div className="min-h-5 flex-1 font-normal">{typeof message === 'string' && message}</div>
+          {!isExporting ? (
+            <Button variant="primary" onClick={handleExport} disabled={!canExport}>
+              {isExporting ? 'Exporting' : 'Export to PPTX'}
+            </Button>
+          ) : (
+            <CancelButton />
+          )}
         </div>
       </div>
     </div>
+  )
+}
+
+function CancelButton() {
+  const [isCancelling, setIsCancelling] = useState(false)
+
+  useMainMessageEvent('export_cancelled', () => {
+    setIsCancelling(false)
+  })
+
+  function handleCancel() {
+    postMainMessage({ type: 'cancel_export' })
+    setIsCancelling(true)
+  }
+
+  return (
+    <Button variant="secondary" onClick={handleCancel} disabled={isCancelling}>
+      {isCancelling ? 'Cancelling' : 'Cancel'}
+    </Button>
   )
 }
