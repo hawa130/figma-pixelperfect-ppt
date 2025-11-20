@@ -3,10 +3,10 @@ import PptxGenJS from 'pptxgenjs'
 import type { ExportImageData } from '../../shared/types'
 import { uint8ArrayToBase64 } from './utils'
 
-const INCHES_PER_PIXEL = 1 / 192
+const PIXELS_PER_INCH = 144
 
 function pixelsToInches(pixels: number): number {
-  return pixels * INCHES_PER_PIXEL
+  return pixels / PIXELS_PER_INCH
 }
 
 export async function createPptxFromImages(images: ExportImageData[]): Promise<Blob> {
