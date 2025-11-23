@@ -1,5 +1,6 @@
 import { FlatCompat } from '@eslint/eslintrc'
 import js from '@eslint/js'
+import reactHooks from 'eslint-plugin-react-hooks'
 import { defineConfig, globalIgnores } from 'eslint/config'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
@@ -9,7 +10,6 @@ const compat = new FlatCompat({
 })
 
 export default defineConfig([
-  ...compat.extends('plugin:@figma/figma-plugins/recommended'),
   {
     files: ['**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     languageOptions: { globals: globals.browser },
@@ -23,6 +23,14 @@ export default defineConfig([
   tseslint.configs.recommendedTypeChecked,
   tseslint.configs.stylisticTypeChecked,
   {
+    languageOptions: {
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ['*.{ts,tsx,js,jsx,mjs}'],
+        },
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
     rules: {
       '@typescript-eslint/prefer-nullish-coalescing': ['error', { ignorePrimitives: { boolean: true, string: true } }],
       '@typescript-eslint/no-inferrable-types': ['error', { ignoreParameters: true }],
@@ -42,14 +50,8 @@ export default defineConfig([
       '@typescript-eslint/prefer-regexp-exec': 'off',
       '@typescript-eslint/consistent-indexed-object-style': 'off',
     },
-    languageOptions: {
-      parserOptions: {
-        projectService: {
-          allowDefaultProject: ['*.{ts,tsx,js,jsx,mjs}'],
-        },
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
   },
+  ...compat.extends('plugin:@figma/figma-plugins/recommended'),
+  reactHooks.configs.flat['recommended-latest'],
   globalIgnores(['node_modules/', 'dist/']),
 ])

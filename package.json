@@ -27,6 +27,7 @@
     "@typescript-eslint/eslint-plugin": "^8.46.4",
     "@typescript-eslint/parser": "^8.46.4",
     "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^16.5.0",
     "postcss": "^8.5.6",
     "prettier": "^3.6.2",
@@ -46,6 +47,7 @@
     "radashi": "^12.7.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-use": "^17.6.0",
     "tailwind-merge": "^3.4.0"
   }
 }
