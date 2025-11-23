@@ -187,3 +187,7 @@ body {
   letter-spacing: var(--letter-spacing-3);
   font-weight: var(--font-weight-default);
 }
+
+* {
+  border-color: var(--color-border);
+}

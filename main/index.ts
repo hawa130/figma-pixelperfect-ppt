@@ -54,7 +54,7 @@ function main() {
   figma.showUI(__html__, {
     themeColors: true,
     width: 240,
-    height: 208,
+    height: 272,
   })
 }
 
