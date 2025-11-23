@@ -57,7 +57,7 @@ export function useMainMessageEvent<TType extends MessageToUI['type']>(
   useEffect(() => {
     const unregister = onMainMessage(type, handler)
     return () => unregister()
-  }, [type]) // Handler is non-reactive, no need to add to dependencies
+  }, [type]) // eslint-disable-line react-hooks/exhaustive-deps -- Handler is non-reactive, no need to add to dependencies
 }
 
 export function postMainMessage(message: MessageFromUI) {

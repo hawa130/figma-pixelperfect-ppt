@@ -51,10 +51,14 @@ function main() {
     })
   })
 
+  onUIMessage('update_size', (message) => {
+    figma.ui.resize(message.width, message.height)
+  })
+
   figma.showUI(__html__, {
     themeColors: true,
     width: 240,
-    height: 272,
+    height: 251,
   })
 }
 

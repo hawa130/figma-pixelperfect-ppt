@@ -2,6 +2,7 @@ import { Button, Input, RadioGroup, SegmentedControl, Select, Tooltip, ValueFiel
 import { useCallback, useEffect, useState } from 'react'
 
 import { Form, FormField, FormLabel, FormSection } from './components/form'
+import { useContainerSize } from './hooks/use-container-size'
 import { HelpIcon } from './icons/help'
 import { postMainMessage, useMainMessage, useMainMessageEvent } from './lib'
 import { downloadFile } from './lib/download'
@@ -18,6 +19,8 @@ export function Plugin() {
   const [sizeMode, setSizeMode] = useState<'original' | 'custom'>('original')
   const [customWidth, setCustomWidth] = useState(1920)
   const [customHeight, setCustomHeight] = useState(1080)
+
+  const containerRef = useContainerSize()
 
   useMainMessageEvent('selection_update', (message) => {
     setFrameCount(message.frameCount)
@@ -87,7 +90,7 @@ export function Plugin() {
   const canExport = frameCount > 0 || mode === 'all'
 
   return (
-    <div className="flex h-full flex-col">
+    <div ref={containerRef}>
       <RadioGroup.Root
         className="px-4 py-3"
         value={mode}
@@ -181,20 +184,19 @@ export function Plugin() {
         </FormSection>
       </Form>
 
-      {!canExport && <div className="px-4 pt-3 text-text-danger">Please select slides to export</div>}
-      {message instanceof Error && <div className="px-4 pt-3 text-text-danger">{message.message}</div>}
-
-      <div className="flex flex-1 flex-col justify-end gap-2">
-        <div className="flex items-end p-4 pt-3">
-          <div className="min-h-5 flex-1 font-normal">{typeof message === 'string' && message}</div>
-          {!isExporting ? (
-            <Button variant="primary" onClick={handleExport} disabled={!canExport}>
-              {isExporting ? 'Exporting' : 'Export to PPTX'}
-            </Button>
-          ) : (
-            <CancelButton />
-          )}
-        </div>
+      <div className="not-empty:-mb-1 not-empty:px-4 not-empty:pt-3">
+        {!canExport && <div className="text-text-danger">Please select slides to export</div>}
+        {message instanceof Error && <div className="text-text-danger">{message.message}</div>}
+      </div>
+      <div className="flex items-end p-4">
+        <div className="min-h-5 flex-1 font-normal">{typeof message === 'string' && message}</div>
+        {!isExporting ? (
+          <Button variant="primary" onClick={handleExport} disabled={!canExport}>
+            {isExporting ? 'Exporting' : 'Export to PPTX'}
+          </Button>
+        ) : (
+          <CancelButton />
+        )}
       </div>
     </div>
   )

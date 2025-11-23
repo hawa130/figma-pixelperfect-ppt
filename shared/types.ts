@@ -60,8 +60,15 @@ interface QueryFilenameMessage {
   type: 'query_filename'
 }
 
+interface UpdateSizeMessage {
+  type: 'update_size'
+  width: number
+  height: number
+}
+
 export type MessageFromUI =
   | ExportFramesAsImagesMessage
   | QuerySelectionMessage
   | QueryFilenameMessage
   | CancelExportMessage
+  | UpdateSizeMessage
