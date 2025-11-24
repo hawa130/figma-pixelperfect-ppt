@@ -8,7 +8,8 @@ Unlike Figma's built-in PowerPoint export which is editable but has rendering is
 
 - Export all slides or only selected ones
 - Adjustable quality settings from 1x to 4x
-- Custom slide dimensions with automatic image cropping
+- Custom slide dimensions with four resize modes (Fit, Fill, Stretch, Original)
+- Real-time preview of export results before exporting
 - Real-time export progress tracking and cancellation
 - Automatic slide ordering by page numbers
 - Runs entirely locally with no network access
@@ -25,7 +26,8 @@ Unlike Figma's built-in PowerPoint export which is editable but has rendering is
 
 - 导出全部幻灯片或仅导出选中的幻灯片
 - 可调节质量设置，支持 1x 到 4x
-- 自定义幻灯片尺寸，自动裁剪图片
+- 自定义幻灯片尺寸，提供四种调整大小模式（Fit、Fill、Stretch、Original）
+- 导出前实时预览结果
 - 实时导出进度跟踪和取消功能
 - 自动按页码排序保证顺序
 - 纯本地运行，不访问网络

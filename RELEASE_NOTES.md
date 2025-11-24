@@ -1,5 +1,14 @@
 # Release Notes
 
+## Version 1.3.0
+
+**Release Date:** 2025/11/24
+
+### What's New
+
+- Resize Mode Selection: Added resize mode options (Fit, Fill, Stretch, Original) for custom dimensions.
+- Result Preview: Added real-time preview of export results with live updates when adjusting dimensions or resize modes.
+
 ## Version 1.2.1
 
 **Release Date:** 2025/11/24
