@@ -27,7 +27,7 @@ export function FramePreview({ className, ...props }: ComponentProps<'div'>) {
 
   useEffect(() => {
     postMainMessage({ type: 'export_thumbnail' })
-    if (!ref.current) return
+    if (!ref.current || imageDataRef.current) return
     const canvas = ref.current
     canvas.width = 480
     canvas.height = 270
@@ -75,7 +75,15 @@ export function FramePreview({ className, ...props }: ComponentProps<'div'>) {
   useMainMessageEvent('export_thumbnail_complete', (message) => {
     if (!message.image) return
     imageDataRef.current = message.image
-    void drawImage(message.image.bytes)
+    const { sizeMode } = usePluginStore.getState()
+    switch (sizeMode) {
+      case 'original':
+        void drawImage(message.image.bytes)
+        break
+      case 'custom':
+        void processImage(message.image).then((image) => drawImage(image))
+        break
+    }
   })
 
   return (
