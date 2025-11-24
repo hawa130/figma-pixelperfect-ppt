@@ -1,5 +1,13 @@
 # Release Notes
 
+## Version 1.2.1
+
+**Release Date:** 2025/11/24
+
+### Bug Fixes
+
+- Text Selection: Adjusted text selection color to better match Figma's theme.
+
 ## Version 1.2.0
 
 **Release Date:** 2025/11/23

@@ -1,6 +1,6 @@
 {
   "name": "pixelperfect-ppt",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Convert Figma to pixel perfect PPT",
   "main": "code.js",
   "type": "module",
