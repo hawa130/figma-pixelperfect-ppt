@@ -27,6 +27,13 @@ export function FramePreview({ className, ...props }: ComponentProps<'div'>) {
 
   useEffect(() => {
     postMainMessage({ type: 'export_thumbnail' })
+    if (!ref.current) return
+    const canvas = ref.current
+    canvas.width = 480
+    canvas.height = 270
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    drawCheckerboardBackground(ctx, canvas.width, canvas.height)
   }, [])
 
   const drawImage = useCallback(async (image: Uint8Array | Blob) => {
