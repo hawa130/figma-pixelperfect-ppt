@@ -1,7 +1,7 @@
 import PptxGenJS from 'pptxgenjs'
 
 import type { ExportImageData } from '../../shared/types'
-import { cropImageToFill } from './image'
+import { resizeImage, type ResizeMode } from './image'
 import { uint8ArrayToBase64 } from './utils'
 
 const PIXELS_PER_INCH = 144
@@ -14,6 +14,7 @@ export interface PptxOptions {
   width?: number
   height?: number
   scale?: number
+  mode?: ResizeMode
 }
 
 export async function createPptxFromImages(images: ExportImageData[], options: PptxOptions = {}): Promise<Blob> {
@@ -21,7 +22,7 @@ export async function createPptxFromImages(images: ExportImageData[], options: P
     throw new Error('No slides to export')
   }
 
-  const { width, height, scale } = options
+  const { width, height, scale, mode = 'fill' } = options
   const globalWidth = width ?? Math.max(...images.map((img) => img.width))
   const globalHeight = height ?? Math.max(...images.map((img) => img.height))
 
@@ -41,11 +42,12 @@ export async function createPptxFromImages(images: ExportImageData[], options: P
     const needToCrop = image.width !== globalWidth || image.height !== globalHeight
     const base64 = uint8ArrayToBase64(
       needToCrop
-        ? await cropImageToFill({
+        ? await resizeImage({
             input: image.bytes,
             width: globalWidth,
             height: globalHeight,
             scale,
+            mode,
           })
         : image.bytes,
     )
