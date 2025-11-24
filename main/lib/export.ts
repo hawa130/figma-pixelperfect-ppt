@@ -1,5 +1,5 @@
 import { postUIMessage } from '.'
-import type { ExportImageData } from '../../shared/types'
+import type { ExportImageData, ExportThumbnailData } from '../../shared/types'
 import { defaultExportSettings } from '../settings'
 import type { TaskOptions } from './types'
 
@@ -48,4 +48,13 @@ export async function exportFramesAsImages(
     figma.notify(message, { error: true })
     postUIMessage({ type: 'export_error', message })
   }
+}
+
+export async function exportThumbnail(frame: BaseFrameMixin): Promise<ExportThumbnailData> {
+  const scale = 0.25
+  const bytes = await frame.exportAsync({
+    format: 'PNG',
+    constraint: { type: 'SCALE', value: scale },
+  })
+  return { bytes, width: frame.width, height: frame.height, scale }
 }

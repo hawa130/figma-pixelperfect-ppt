@@ -1,6 +1,6 @@
 export type ResizeMode = 'fill' | 'fit' | 'original' | 'stretch' | 'scale-down'
 
-export interface ResizeOptions {
+export interface ResizeOptionsBase {
   input: Uint8Array
   width: number
   height: number
@@ -10,6 +10,18 @@ export interface ResizeOptions {
   quality?: number
 }
 
+export interface ResizeOptionsUint8Array extends ResizeOptionsBase {
+  outputType?: 'uint8array'
+}
+
+export interface ResizeOptionsBlob extends ResizeOptionsBase {
+  outputType: 'blob'
+}
+
+export type ResizeOptions = ResizeOptionsUint8Array | ResizeOptionsBlob
+
+export function resizeImage(options: ResizeOptionsUint8Array): Promise<Uint8Array>
+export function resizeImage(options: ResizeOptionsBlob): Promise<Blob>
 export async function resizeImage({
   input,
   width,
@@ -18,7 +30,8 @@ export async function resizeImage({
   scale = 1,
   mimeType = 'image/png',
   quality = 0.95,
-}: ResizeOptions): Promise<Uint8Array> {
+  outputType = 'uint8array',
+}: ResizeOptions): Promise<Uint8Array | Blob> {
   const blob = new Blob([input as BlobPart], { type: mimeType })
   const bitmap = await createImageBitmap(blob)
 
@@ -98,10 +111,19 @@ export async function resizeImage({
           reject(new Error('Image encoding failed'))
           return
         }
-        blob
-          .arrayBuffer()
-          .then((buffer) => resolve(new Uint8Array(buffer)))
-          .catch(reject)
+        switch (outputType) {
+          case 'uint8array': {
+            blob
+              .arrayBuffer()
+              .then((buffer) => resolve(new Uint8Array(buffer)))
+              .catch(reject)
+            break
+          }
+          case 'blob': {
+            resolve(blob)
+            break
+          }
+        }
       },
       mimeType,
       quality,

@@ -52,7 +52,7 @@ export function useMainMessage<TType extends MessageToUI['type']>(
 
 export function useMainMessageEvent<TType extends MessageToUI['type']>(
   type: TType,
-  handler: (message: MessageByType<TType>) => void,
+  handler: (message: MessageByType<TType>) => void | Promise<void>,
 ) {
   useEffect(() => {
     const unregister = onMainMessage(type, handler)

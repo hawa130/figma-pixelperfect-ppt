@@ -32,3 +32,11 @@ export function FormSection({ children, className, ...props }: ComponentProps<'d
     </div>
   )
 }
+
+export function FormRow({ children, className, ...props }: ComponentProps<'div'>) {
+  return (
+    <div className={clsx('col-span-2', className)} {...props}>
+      {children}
+    </div>
+  )
+}

@@ -3,7 +3,8 @@ import { useEffect } from 'react'
 import { DimensionsField } from './components/dimensions-field'
 import { ExportButton } from './components/export-button'
 import { FilenameField } from './components/filename-field'
-import { Form, FormSection } from './components/form'
+import { Form, FormRow, FormSection } from './components/form'
+import { FramePreview } from './components/frame-preview'
 import { MessageDisplay } from './components/message-display'
 import { ModeSelector } from './components/mode-selector'
 import { QualityField } from './components/quality-field'
@@ -58,6 +59,9 @@ export function Plugin() {
         <FormSection>
           <QualityField />
           <DimensionsField />
+          <FormRow className="pt-1">
+            <FramePreview />
+          </FormRow>
         </FormSection>
       </Form>
       <MessageDisplay />

@@ -2,6 +2,7 @@ import { create } from 'zustand'
 
 import type { ExportImageData } from '../../shared/types'
 import { downloadFile } from '../lib/download'
+import type { ResizeMode } from '../lib/image'
 import { createPptxFromImages, type PptxOptions } from '../lib/pptx'
 
 interface PluginState {
@@ -13,6 +14,7 @@ interface PluginState {
   scale: number
   sizeMode: 'original' | 'custom'
   customSize: { width: number; height: number }
+  resizeMode: ResizeMode
 
   setFrameCount: (count: number) => void
   setMode: (mode: 'selected' | 'all') => void
@@ -23,6 +25,7 @@ interface PluginState {
   setSizeMode: (sizeMode: 'original' | 'custom') => void
   setCustomWidth: (width: number) => void
   setCustomHeight: (height: number) => void
+  setResizeMode: (resizeMode: ResizeMode) => void
 
   startExport: () => void
   cancelExport: () => void
@@ -40,6 +43,7 @@ export const usePluginStore = create<PluginState>((set, get) => ({
   scale: 2,
   sizeMode: 'original',
   customSize: { width: 1920, height: 1080 },
+  resizeMode: 'fill',
 
   setFrameCount: (count) => set({ frameCount: count }),
   setMode: (mode) => set({ mode }),
@@ -50,7 +54,7 @@ export const usePluginStore = create<PluginState>((set, get) => ({
   setSizeMode: (sizeMode) => set({ sizeMode }),
   setCustomWidth: (width) => set((prev) => ({ customSize: { ...prev.customSize, width } })),
   setCustomHeight: (height) => set((prev) => ({ customSize: { ...prev.customSize, height } })),
-
+  setResizeMode: (resizeMode) => set({ resizeMode }),
   startExport: () => set({ isExporting: true, message: null }),
   cancelExport: () => set({ isExporting: false, message: null }),
   handleExportProgress: (current, total) =>
@@ -73,6 +77,7 @@ export const usePluginStore = create<PluginState>((set, get) => ({
               width: state.customSize.width,
               height: state.customSize.height,
               scale: state.scale,
+              mode: state.resizeMode,
             }
           : undefined
       const blob = await createPptxFromImages(images, settings)

@@ -4,6 +4,13 @@ export interface ExportImageData {
   height: number
 }
 
+export interface ExportThumbnailData {
+  bytes: Uint8Array
+  width: number
+  height: number
+  scale: number
+}
+
 interface SelectionUpdate {
   type: 'selection_update'
   frameCount: number
@@ -34,6 +41,11 @@ interface FilenameUpdate {
   filename: string
 }
 
+interface ExportThumbnail {
+  type: 'export_thumbnail_complete'
+  image?: ExportThumbnailData
+}
+
 export type MessageToUI =
   | SelectionUpdate
   | ExportComplete
@@ -41,6 +53,7 @@ export type MessageToUI =
   | FilenameUpdate
   | ExportProgress
   | ExportCancelled
+  | ExportThumbnail
 
 interface ExportFramesAsImagesMessage {
   type: 'export_frames_as_images'
@@ -66,9 +79,14 @@ interface UpdateSizeMessage {
   height: number
 }
 
+interface ExportThumbnailMessage {
+  type: 'export_thumbnail'
+}
+
 export type MessageFromUI =
   | ExportFramesAsImagesMessage
   | QuerySelectionMessage
   | QueryFilenameMessage
   | CancelExportMessage
   | UpdateSizeMessage
+  | ExportThumbnailMessage

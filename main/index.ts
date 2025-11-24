@@ -1,8 +1,8 @@
 import { assign } from 'radashi'
 
 import { onUIMessage, postUIMessage } from './lib'
-import { exportFramesAsImages } from './lib/export'
-import { getAllSlides, getSelectedSlides } from './lib/get-slides'
+import { exportFramesAsImages, exportThumbnail } from './lib/export'
+import { getAllSlides, getPreviewSlide, getSelectedSlides } from './lib/get-slides'
 import { createTask } from './lib/task'
 import { defaultExportSettings } from './settings'
 
@@ -51,8 +51,22 @@ function main() {
     })
   })
 
+  onUIMessage('export_thumbnail', async () => {
+    const slide = getPreviewSlide()
+    if (!slide) return
+    const image = await exportThumbnail(slide)
+    postUIMessage({ type: 'export_thumbnail_complete', image })
+  })
+
+  figma.on('selectionchange', async () => {
+    const slide = getPreviewSlide()
+    if (!slide) return
+    const image = await exportThumbnail(slide)
+    postUIMessage({ type: 'export_thumbnail_complete', image })
+  })
+
   onUIMessage('update_size', (message) => {
-    figma.ui.resize(message.width, message.height)
+    figma.ui.resize(Math.ceil(message.width), Math.ceil(message.height))
   })
 
   figma.showUI(__html__, {
