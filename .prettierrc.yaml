@@ -24,6 +24,7 @@ tailwindStylesheet: ./ui/globals.css
 importOrder:
   - '<BUILTIN_MODULES>'
   - ''
+  - '^(react/(.*)$)|^(react$)'
   - '<THIRD_PARTY_MODULES>'
   - ''
   - '^/'

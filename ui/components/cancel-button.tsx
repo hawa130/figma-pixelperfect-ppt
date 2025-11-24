@@ -1,5 +1,5 @@
-import { Button } from 'figma-kit'
 import { useState } from 'react'
+import { Button } from 'figma-kit'
 
 import { postMainMessage, useMainMessageEvent } from '../lib'
 

@@ -1,5 +1,5 @@
-import clsx from 'clsx'
 import type { ComponentProps } from 'react'
+import { clsx } from 'clsx'
 
 export function FormLabel({ children, className, ...props }: ComponentProps<'label'>) {
   return (
