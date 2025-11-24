@@ -80,7 +80,7 @@ export function FramePreview({ className, ...props }: ComponentProps<'div'>) {
 
   return (
     <div className={className} {...props}>
-      <canvas ref={ref} className="w-full" />
+      <canvas ref={ref} className="w-full border" />
     </div>
   )
 }
