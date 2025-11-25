@@ -24,7 +24,7 @@ export function ExportButton() {
   }
 
   return (
-    <div className="flex items-end p-4">
+    <div className="flex items-end py-2.5 pr-2.5 pl-4">
       <div className="min-h-5 flex-1 font-normal">{typeof message === 'string' && message}</div>
       {!isExporting ? (
         <Button variant="primary" onClick={handleExport} disabled={!canExport}>

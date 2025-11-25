@@ -3,8 +3,6 @@ export function downloadFile({ filename, blob }: { filename: string; blob: Blob 
   const a = document.createElement('a')
   a.href = url
   a.download = filename
-  document.body.appendChild(a)
   a.click()
-  document.body.removeChild(a)
   URL.revokeObjectURL(url)
 }
