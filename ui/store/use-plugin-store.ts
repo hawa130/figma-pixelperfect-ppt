@@ -23,6 +23,7 @@ interface PluginState {
   setFilename: (filename: string) => void
   setScale: (scale: number) => void
   setSizeMode: (sizeMode: 'original' | 'custom') => void
+  setCustomSize: (size: { width: number; height: number }) => void
   setCustomWidth: (width: number) => void
   setCustomHeight: (height: number) => void
   setResizeMode: (resizeMode: ResizeMode) => void
@@ -41,7 +42,7 @@ export const usePluginStore = create<PluginState>((set, get) => ({
   message: null,
   filename: 'Slides',
   scale: 2,
-  sizeMode: 'original',
+  sizeMode: 'custom',
   customSize: { width: 1920, height: 1080 },
   resizeMode: 'fill',
 
@@ -52,6 +53,7 @@ export const usePluginStore = create<PluginState>((set, get) => ({
   setFilename: (filename) => set({ filename }),
   setScale: (scale) => set({ scale }),
   setSizeMode: (sizeMode) => set({ sizeMode }),
+  setCustomSize: (size) => set({ customSize: size }),
   setCustomWidth: (width) => set((prev) => ({ customSize: { ...prev.customSize, width } })),
   setCustomHeight: (height) => set((prev) => ({ customSize: { ...prev.customSize, height } })),
   setResizeMode: (resizeMode) => set({ resizeMode }),
