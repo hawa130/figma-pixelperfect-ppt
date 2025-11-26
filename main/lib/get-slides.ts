@@ -21,7 +21,14 @@ export function getPreviewSlide() {
 }
 
 export function getSlides(mode: 'selected' | 'all' = 'all') {
-  return mode === 'selected' ? getSelectedSlides() : getAllSlides()
+  const slides = mode === 'selected' ? getSelectedSlides() : getAllSlides()
+  return slides
+    .map((frame) => {
+      const match = frame.name.match(/\d+/)
+      return match ? { frame, pageNumber: parseInt(match[0], 10) } : { frame, pageNumber: 0xfffffff }
+    })
+    .sort((a, b) => a.pageNumber - b.pageNumber)
+    .map((item) => item.frame)
 }
 
 export function getMaxSlideDimensions(mode: 'selected' | 'all' = 'all') {

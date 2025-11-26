@@ -11,6 +11,12 @@ export function getPreviewFrame() {
 
 export function getFrames() {
   return getSelectedFrames()
+    .map((frame) => {
+      const match = frame.name.match(/\d+/)
+      return match ? { frame, pageNumber: parseInt(match[0], 10) } : { frame, pageNumber: 0xfffffff }
+    })
+    .sort((a, b) => a.pageNumber - b.pageNumber)
+    .map((item) => item.frame)
 }
 
 export function getMaxFrameDimensions() {

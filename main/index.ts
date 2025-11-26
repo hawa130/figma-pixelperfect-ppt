@@ -1,4 +1,4 @@
-import { assign } from 'radashi'
+import { assign, debounce } from 'radashi'
 
 import { onUIMessage, postUIMessage } from './lib'
 import { exportFramesAsImages, exportThumbnail } from './lib/export'
@@ -8,15 +8,7 @@ import { createTask } from './lib/task'
 import { defaultExportSettings } from './settings'
 
 const exportTask = createTask(async (signal, mode: 'selected' | 'all' = 'all', settings?: ExportSettings) => {
-  const nodes = figma.editorType === 'slides' ? getSlides(mode) : getFrames()
-  const frames = nodes
-    .map((frame) => {
-      const match = frame.name.match(/\d+/)
-      return match ? { frame, pageNumber: parseInt(match[0], 10) } : { frame, pageNumber: 0xfffffff }
-    })
-    .sort((a, b) => a.pageNumber - b.pageNumber)
-    .map((item) => item.frame)
-
+  const frames = figma.editorType === 'slides' ? getSlides(mode) : getFrames()
   return await exportFramesAsImages(frames, settings, { signal })
 })
 
@@ -25,13 +17,28 @@ function handleGetSelectedNodes() {
   postUIMessage({ type: 'selection_update', frameCount: frames.length })
 }
 
+function handleSelectedNodeChange(event: NodeChangeEvent) {
+  event.nodeChanges.forEach(async (change) => {
+    const frame = figma.editorType === 'slides' ? getPreviewSlide() : getPreviewFrame()
+    if (!frame) {
+      postUIMessage({ type: 'export_thumbnail_complete' })
+      return
+    }
+    if (change.id === frame?.id) {
+      const image = await exportThumbnail(frame)
+      const dimensions = figma.editorType === 'slides' ? getMaxSlideDimensions() : getMaxFrameDimensions()
+      postUIMessage({ type: 'export_thumbnail_complete', image, dimensions })
+    }
+  })
+}
+
 async function handleThumbnailExport() {
-  const frames = figma.editorType === 'slides' ? getPreviewSlide() : getPreviewFrame()
-  if (!frames) {
+  const frame = figma.editorType === 'slides' ? getPreviewSlide() : getPreviewFrame()
+  if (!frame) {
     postUIMessage({ type: 'export_thumbnail_complete' })
     return
   }
-  const image = await exportThumbnail(frames)
+  const image = await exportThumbnail(frame)
   const dimensions = figma.editorType === 'slides' ? getMaxSlideDimensions() : getMaxFrameDimensions()
   postUIMessage({ type: 'export_thumbnail_complete', image, dimensions })
 }
@@ -54,6 +61,7 @@ function main() {
 
   onUIMessage('export_thumbnail', handleThumbnailExport)
   figma.on('selectionchange', handleThumbnailExport)
+  figma.currentPage.on('nodechange', debounce({ delay: 300 }, handleSelectedNodeChange))
 
   onUIMessage('update_size', (message) => {
     figma.ui.resize(Math.ceil(message.width), Math.ceil(message.height))
