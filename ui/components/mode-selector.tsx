@@ -1,11 +1,11 @@
 import { RadioGroup, Tooltip } from 'figma-kit'
 
-import { useEditorType } from '../hooks/use-editor-context'
 import { HelpIcon } from '../icons/help'
+import { useEditorStore } from '../store/use-editor-store'
 import { usePluginStore } from '../store/use-plugin-store'
 
 export function ModeSelector() {
-  const editorType = useEditorType()
+  const editorType = useEditorStore((state) => state.editorType)
   const frameCount = usePluginStore((state) => state.frameCount)
   const mode = usePluginStore((state) => state.mode)
   const setMode = usePluginStore((state) => state.setMode)

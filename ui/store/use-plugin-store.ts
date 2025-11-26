@@ -13,8 +13,8 @@ interface PluginState {
   filename: string
   scale: number
   sizeMode: 'original' | 'custom'
-  customSize: { width: number; height: number }
-  resizeMode: ResizeMode
+  customSize: { width: number; height: number; resizeMode: ResizeMode }
+  originalSize: { resizeMode: ResizeMode }
 
   setFrameCount: (count: number) => void
   setMode: (mode: 'selected' | 'all') => void
@@ -26,7 +26,8 @@ interface PluginState {
   setCustomSize: (size: { width: number; height: number }) => void
   setCustomWidth: (width: number) => void
   setCustomHeight: (height: number) => void
-  setResizeMode: (resizeMode: ResizeMode) => void
+  setCustomResizeMode: (resizeMode: ResizeMode) => void
+  setOriginalResizeMode: (resizeMode: ResizeMode) => void
 
   startExport: () => void
   cancelExport: () => void
@@ -43,8 +44,8 @@ export const usePluginStore = create<PluginState>((set, get) => ({
   filename: 'Slides',
   scale: 2,
   sizeMode: 'original',
-  customSize: { width: 1920, height: 1080 },
-  resizeMode: 'fill',
+  customSize: { width: 1920, height: 1080, resizeMode: 'fill' },
+  originalSize: { resizeMode: 'original' },
 
   setFrameCount: (count) => set({ frameCount: count }),
   setMode: (mode) => set({ mode }),
@@ -53,10 +54,11 @@ export const usePluginStore = create<PluginState>((set, get) => ({
   setFilename: (filename) => set({ filename }),
   setScale: (scale) => set({ scale }),
   setSizeMode: (sizeMode) => set({ sizeMode }),
-  setCustomSize: (size) => set({ customSize: size }),
+  setCustomSize: (size) => set((prev) => ({ customSize: { ...prev.customSize, ...size } })),
   setCustomWidth: (width) => set((prev) => ({ customSize: { ...prev.customSize, width } })),
   setCustomHeight: (height) => set((prev) => ({ customSize: { ...prev.customSize, height } })),
-  setResizeMode: (resizeMode) => set({ resizeMode }),
+  setCustomResizeMode: (resizeMode) => set((prev) => ({ customSize: { ...prev.customSize, resizeMode } })),
+  setOriginalResizeMode: (resizeMode) => set((prev) => ({ originalSize: { ...prev.originalSize, resizeMode } })),
   startExport: () => set({ isExporting: true, message: null }),
   cancelExport: () => set({ isExporting: false, message: null }),
   handleExportProgress: (current, total) =>
@@ -79,11 +81,11 @@ export const usePluginStore = create<PluginState>((set, get) => ({
               width: state.customSize.width,
               height: state.customSize.height,
               scale: state.scale,
-              mode: state.resizeMode,
+              mode: state.customSize.resizeMode,
             }
           : {
-              mode: 'original',
               scale: state.scale,
+              mode: state.originalSize.resizeMode,
             }
       const blob = await createPptxFromImages(images, settings)
       downloadFile({ filename: `${state.filename}.pptx`, blob })

@@ -1,9 +1,9 @@
 import { useCanExport } from '../hooks/use-can-export'
-import { useEditorType } from '../hooks/use-editor-context'
+import { useEditorStore } from '../store/use-editor-store'
 import { usePluginStore } from '../store/use-plugin-store'
 
 export function MessageDisplay() {
-  const editorType = useEditorType()
+  const editorType = useEditorStore((state) => state.editorType)
   const message = usePluginStore((state) => state.message)
   const canExport = useCanExport()
 

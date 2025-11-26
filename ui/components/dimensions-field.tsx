@@ -28,8 +28,13 @@ export function DimensionsField() {
               Custom
             </SegmentedControl.Item>
           </SegmentedControl.Root>
-          {sizeMode === 'custom' && <CustomDimensionsField />}
-          {sizeMode === 'custom' && <ResizeModeSelector />}
+          {sizeMode === 'custom' && (
+            <>
+              <CustomDimensionsField />
+              <CustomResizeModeSelector />
+            </>
+          )}
+          {sizeMode === 'original' && <OriginalResizeModeSelector />}
         </div>
       </FormField>
     </>
@@ -140,9 +145,31 @@ function PresetsSelector() {
   )
 }
 
-function ResizeModeSelector() {
-  const resizeMode = usePluginStore((state) => state.resizeMode)
-  const setResizeMode = usePluginStore((state) => state.setResizeMode)
+function OriginalResizeModeSelector() {
+  const frameCount = usePluginStore((state) => state.frameCount)
+  const resizeMode = usePluginStore((state) => state.originalSize.resizeMode)
+  const setResizeMode = usePluginStore((state) => state.setOriginalResizeMode)
+
+  if (frameCount <= 1) {
+    return null
+  }
+
+  return (
+    <Select.Root value={resizeMode} onValueChange={(value) => setResizeMode(value as ResizeMode)}>
+      <Select.Trigger />
+      <Select.Content>
+        <Select.Item value="original">Original</Select.Item>
+        <Select.Item value="fit">Fit</Select.Item>
+        <Select.Item value="fill">Fill</Select.Item>
+        <Select.Item value="stretch">Stretch</Select.Item>
+      </Select.Content>
+    </Select.Root>
+  )
+}
+
+function CustomResizeModeSelector() {
+  const resizeMode = usePluginStore((state) => state.customSize.resizeMode)
+  const setResizeMode = usePluginStore((state) => state.setCustomResizeMode)
 
   return (
     <Select.Root value={resizeMode} onValueChange={(value) => setResizeMode(value as ResizeMode)}>

@@ -1,8 +1,8 @@
+import { useEditorStore } from '../store/use-editor-store'
 import { usePluginStore } from '../store/use-plugin-store'
-import { useEditorType } from './use-editor-context'
 
 export function useCanExport() {
-  const editorType = useEditorType()
+  const editorType = useEditorStore((state) => state.editorType)
   const frameCount = usePluginStore((state) => state.frameCount)
   const mode = usePluginStore((state) => state.mode)
 

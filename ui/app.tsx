@@ -1,14 +1,13 @@
 import { TooltipProvider } from 'figma-kit'
 
-import { EditorContextProvider } from './hooks/use-editor-context'
+import { EditorStoreLoader } from './components/editor-store-loader'
 import { Plugin } from './plugin'
 
 export function App() {
   return (
-    <EditorContextProvider>
-      <TooltipProvider delayDuration={100}>
-        <Plugin />
-      </TooltipProvider>
-    </EditorContextProvider>
+    <TooltipProvider delayDuration={100}>
+      <EditorStoreLoader />
+      <Plugin />
+    </TooltipProvider>
   )
 }

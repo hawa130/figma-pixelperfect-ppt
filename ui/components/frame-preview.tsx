@@ -9,8 +9,7 @@ import { usePluginStore } from '../store/use-plugin-store'
 
 function applyCustomSize(image: ExportThumbnailData) {
   const {
-    customSize: { width, height },
-    resizeMode,
+    customSize: { width, height, resizeMode },
   } = usePluginStore.getState()
   return resizeImage({
     input: image.bytes,
@@ -26,12 +25,15 @@ async function applyOriginalSize(image: ExportThumbnailData, dimensions: Dimensi
   if (image.width === dimensions.width && image.height === dimensions.height) {
     return new Blob([image.bytes as BlobPart], { type: 'image/png' })
   }
+  const {
+    originalSize: { resizeMode },
+  } = usePluginStore.getState()
   return resizeImage({
     input: image.bytes,
     scale: dimensions.scale,
     width: dimensions.width,
     height: dimensions.height,
-    mode: 'original',
+    mode: resizeMode,
     outputType: 'blob',
   })
 }
@@ -57,14 +59,13 @@ export function FramePreview({ className, ...props }: ComponentProps<'div'>) {
     resetCanvas()
   }, [resetCanvas])
 
-  const drawImage = useCallback(async (image: Uint8Array | Blob) => {
+  const drawImage = useCallback(async (image: Blob) => {
     if (!ref.current) return
     const canvas = ref.current
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    const blob = image instanceof Blob ? image : new Blob([image as BlobPart], { type: 'image/png' })
-    const bitmap = await createImageBitmap(blob)
+    const bitmap = await createImageBitmap(image)
     canvas.width = bitmap.width
     canvas.height = bitmap.height
 
@@ -78,13 +79,13 @@ export function FramePreview({ className, ...props }: ComponentProps<'div'>) {
       if (
         current.customSize.width !== prev.customSize.width ||
         current.customSize.height !== prev.customSize.height ||
-        current.resizeMode !== prev.resizeMode ||
+        current.customSize.resizeMode !== prev.customSize.resizeMode ||
+        current.originalSize.resizeMode !== prev.originalSize.resizeMode ||
         current.sizeMode !== prev.sizeMode
       ) {
-        if (!imageDataRef.current) return
+        if (!imageDataRef.current || !dimensionsRef.current) return
         switch (current.sizeMode) {
           case 'original':
-            if (!dimensionsRef.current) return
             void applyOriginalSize(imageDataRef.current, dimensionsRef.current).then(drawImage)
             break
           case 'custom':
