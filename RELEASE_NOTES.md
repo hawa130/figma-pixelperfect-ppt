@@ -1,5 +1,13 @@
 # Release Notes
 
+## Version 1.3.1
+
+**Release Date:** 2025/11/25
+
+### What's New
+
+- Presets Selector: Added dimension presets selector for quick selection of common slide sizes.
+
 ## Version 1.3.0
 
 **Release Date:** 2025/11/24
