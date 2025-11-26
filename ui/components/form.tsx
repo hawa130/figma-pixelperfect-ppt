@@ -19,7 +19,7 @@ export function FormField({ children, className, ...props }: ComponentProps<'div
 
 export function Form({ children, className, ...props }: ComponentProps<'div'>) {
   return (
-    <div className={clsx('grid grid-cols-[auto_minmax(0,1fr)] items-center border-t', className)} {...props}>
+    <div className={clsx('grid grid-cols-[auto_minmax(0,1fr)] items-center border-b', className)} {...props}>
       {children}
     </div>
   )

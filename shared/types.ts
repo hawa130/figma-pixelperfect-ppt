@@ -44,6 +44,18 @@ interface FilenameUpdate {
 interface ExportThumbnail {
   type: 'export_thumbnail_complete'
   image?: ExportThumbnailData
+  dimensions?: Dimensions
+}
+
+export interface Dimensions {
+  width: number
+  height: number
+  scale: number
+}
+
+interface EditorTypeResult {
+  type: 'editor_type_result'
+  editorType: typeof figma.editorType
 }
 
 export type MessageToUI =
@@ -54,6 +66,7 @@ export type MessageToUI =
   | ExportProgress
   | ExportCancelled
   | ExportThumbnail
+  | EditorTypeResult
 
 interface ExportFramesAsImagesMessage {
   type: 'export_frames_as_images'
@@ -83,6 +96,10 @@ interface ExportThumbnailMessage {
   type: 'export_thumbnail'
 }
 
+interface QueryEditorTypeMessage {
+  type: 'query_editor_type'
+}
+
 export type MessageFromUI =
   | ExportFramesAsImagesMessage
   | QuerySelectionMessage
@@ -90,3 +107,4 @@ export type MessageFromUI =
   | CancelExportMessage
   | UpdateSizeMessage
   | ExportThumbnailMessage
+  | QueryEditorTypeMessage

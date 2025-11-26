@@ -1,5 +1,6 @@
 import { Button } from 'figma-kit'
 
+import { useCanExport } from '../hooks/use-can-export'
 import { postMainMessage } from '../lib'
 import { usePluginStore } from '../store/use-plugin-store'
 import { CancelButton } from './cancel-button'
@@ -9,10 +10,9 @@ export function ExportButton() {
   const message = usePluginStore((state) => state.message)
   const mode = usePluginStore((state) => state.mode)
   const scale = usePluginStore((state) => state.scale)
-  const frameCount = usePluginStore((state) => state.frameCount)
   const startExport = usePluginStore((state) => state.startExport)
 
-  const canExport = frameCount > 0 || mode === 'all'
+  const canExport = useCanExport()
 
   function handleExport() {
     postMainMessage({

@@ -17,7 +17,10 @@ export async function exportFramesAsImages(
   options: TaskOptions = {},
 ) {
   if (frames.length === 0) {
-    postUIMessage({ type: 'export_error', message: 'No slides selected' })
+    postUIMessage({
+      type: 'export_error',
+      message: figma.editorType === 'slides' ? 'No slides selected' : 'No frames selected',
+    })
     return
   }
 

@@ -42,7 +42,7 @@ export const usePluginStore = create<PluginState>((set, get) => ({
   message: null,
   filename: 'Slides',
   scale: 2,
-  sizeMode: 'custom',
+  sizeMode: 'original',
   customSize: { width: 1920, height: 1080 },
   resizeMode: 'fill',
 
@@ -81,7 +81,10 @@ export const usePluginStore = create<PluginState>((set, get) => ({
               scale: state.scale,
               mode: state.resizeMode,
             }
-          : undefined
+          : {
+              mode: 'original',
+              scale: state.scale,
+            }
       const blob = await createPptxFromImages(images, settings)
       downloadFile({ filename: `${state.filename}.pptx`, blob })
     } catch (error) {

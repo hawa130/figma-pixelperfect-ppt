@@ -54,7 +54,7 @@ export function Plugin() {
   return (
     <div ref={containerRef}>
       <ModeSelector />
-      <Form className="border-b">
+      <Form>
         <FilenameField />
         <FormSection>
           <QualityField />
