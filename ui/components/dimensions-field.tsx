@@ -5,6 +5,7 @@ import { StylesIcon } from '../icons/styles-icon'
 import type { ResizeMode } from '../lib/image'
 import { useEditorStore } from '../store/use-editor-store'
 import { usePluginStore } from '../store/use-plugin-store'
+import { useSharedStore } from '../store/use-shared-store'
 import { FormField, FormLabel } from './form'
 import { ListGroup, ListItem } from './list'
 
@@ -148,7 +149,7 @@ function PresetsSelector() {
 
 function OriginalResizeModeSelector() {
   const editorType = useEditorStore((state) => state.editorType)
-  const frameCount = usePluginStore((state) => state.frameCount)
+  const frameCount = useSharedStore((state) => state.frameCount)
   const resizeMode = usePluginStore((state) => state.originalSize.resizeMode)
   const setResizeMode = usePluginStore((state) => state.setOriginalResizeMode)
 

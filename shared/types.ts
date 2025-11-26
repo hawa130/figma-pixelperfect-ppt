@@ -1,3 +1,5 @@
+import type { EditorMetaRequest, EditorMetaResponse, PluginSharedSyncMessage, PluginSyncRequest } from './state'
+
 export interface ExportImageData {
   bytes: Uint8Array
   width: number
@@ -9,11 +11,6 @@ export interface ExportThumbnailData {
   width: number
   height: number
   scale: number
-}
-
-interface SelectionUpdate {
-  type: 'selection_update'
-  frameCount: number
 }
 
 interface ExportProgress {
@@ -53,33 +50,23 @@ export interface Dimensions {
   scale: number
 }
 
-interface EditorTypeResult {
-  type: 'editor_type_result'
-  editorType: typeof figma.editorType
-}
-
 export type MessageToUI =
-  | SelectionUpdate
   | ExportComplete
   | ExportError
   | FilenameUpdate
   | ExportProgress
   | ExportCancelled
   | ExportThumbnail
-  | EditorTypeResult
+  | PluginSharedSyncMessage
+  | EditorMetaResponse
 
 interface ExportFramesAsImagesMessage {
   type: 'export_frames_as_images'
-  mode: 'selected' | 'all'
   settings: Partial<ExportSettings>
 }
 
 interface CancelExportMessage {
   type: 'cancel_export'
-}
-
-interface QuerySelectionMessage {
-  type: 'query_selection'
 }
 
 interface QueryFilenameMessage {
@@ -96,15 +83,12 @@ interface ExportThumbnailMessage {
   type: 'export_thumbnail'
 }
 
-interface QueryEditorTypeMessage {
-  type: 'query_editor_type'
-}
-
 export type MessageFromUI =
   | ExportFramesAsImagesMessage
-  | QuerySelectionMessage
   | QueryFilenameMessage
   | CancelExportMessage
   | UpdateSizeMessage
   | ExportThumbnailMessage
-  | QueryEditorTypeMessage
+  | PluginSharedSyncMessage
+  | PluginSyncRequest
+  | EditorMetaRequest

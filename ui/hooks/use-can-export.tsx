@@ -1,10 +1,10 @@
 import { useEditorStore } from '../store/use-editor-store'
-import { usePluginStore } from '../store/use-plugin-store'
+import { useSharedStore } from '../store/use-shared-store'
 
 export function useCanExport() {
   const editorType = useEditorStore((state) => state.editorType)
-  const frameCount = usePluginStore((state) => state.frameCount)
-  const mode = usePluginStore((state) => state.mode)
+  const frameCount = useSharedStore((state) => state.frameCount)
+  const mode = useSharedStore((state) => state.mode)
 
   if (editorType === 'figma') {
     return frameCount > 0

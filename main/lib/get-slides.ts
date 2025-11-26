@@ -12,14 +12,6 @@ export function getAllSlides() {
   return figma.currentPage.findAll((node) => node.type === 'SLIDE' && !node.isSkippedSlide) as SlideNode[]
 }
 
-export function getPreviewSlide() {
-  const slide =
-    figma.currentPage.selection.find((node) => node.type === 'SLIDE') ??
-    figma.currentPage.focusedSlide ??
-    (figma.currentPage.findOne((node) => node.type === 'SLIDE') as SlideNode | null)
-  return slide ?? undefined
-}
-
 export function getSlides(mode: 'selected' | 'all' = 'all') {
   const slides = mode === 'selected' ? getSelectedSlides() : getAllSlides()
   return slides
@@ -29,6 +21,19 @@ export function getSlides(mode: 'selected' | 'all' = 'all') {
     })
     .sort((a, b) => a.pageNumber - b.pageNumber)
     .map((item) => item.frame)
+}
+
+export function getPreviewSlide(
+  index = 0,
+  mode: 'selected' | 'all' = 'all',
+): { frame?: SlideNode; total: number; index: number } {
+  const slides = getSlides(mode)
+  const frame = slides[index]
+  return {
+    frame: frame ?? slides[0],
+    total: slides.length,
+    index: frame ? index : 0,
+  }
 }
 
 export function getMaxSlideDimensions(mode: 'selected' | 'all' = 'all') {

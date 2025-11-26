@@ -2,13 +2,13 @@ import { RadioGroup, Tooltip } from 'figma-kit'
 
 import { HelpIcon } from '../icons/help'
 import { useEditorStore } from '../store/use-editor-store'
-import { usePluginStore } from '../store/use-plugin-store'
+import { useSharedStore } from '../store/use-shared-store'
 
 export function ModeSelector() {
   const editorType = useEditorStore((state) => state.editorType)
-  const frameCount = usePluginStore((state) => state.frameCount)
-  const mode = usePluginStore((state) => state.mode)
-  const setMode = usePluginStore((state) => state.setMode)
+  const frameCount = useSharedStore((state) => state.frameCount)
+  const mode = useSharedStore((state) => state.mode)
+  const setMode = useSharedStore((state) => state.setMode)
 
   return (
     editorType === 'slides' && (

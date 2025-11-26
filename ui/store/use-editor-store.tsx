@@ -1,12 +1,22 @@
 import { create } from 'zustand'
 
-interface EditorStore {
-  editorType: typeof figma.editorType | null
+import type { EditorMetaState } from '../../shared/state'
+import { onMainMessage, postMainMessage } from '../lib'
 
-  setEditorType: (editorType: typeof figma.editorType | null) => void
+export const useEditorStore = create<EditorMetaState>(() => ({
+  editorType: null,
+  documentName: null,
+}))
+
+function registerEditorMetaResponse() {
+  return onMainMessage('editor_meta_response', (message) => {
+    useEditorStore.setState(message.state)
+  })
 }
 
-export const useEditorStore = create<EditorStore>((set) => ({
-  editorType: null,
-  setEditorType: (editorType) => set({ editorType }),
-}))
+function requestEditorMeta() {
+  postMainMessage({ type: 'editor_meta_request' })
+}
+
+registerEditorMetaResponse()
+requestEditorMeta()

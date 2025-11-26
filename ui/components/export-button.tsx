@@ -8,7 +8,6 @@ import { CancelButton } from './cancel-button'
 export function ExportButton() {
   const isExporting = usePluginStore((state) => state.isExporting)
   const message = usePluginStore((state) => state.message)
-  const mode = usePluginStore((state) => state.mode)
   const scale = usePluginStore((state) => state.scale)
   const startExport = usePluginStore((state) => state.startExport)
 
@@ -17,7 +16,6 @@ export function ExportButton() {
   function handleExport() {
     postMainMessage({
       type: 'export_frames_as_images',
-      mode,
       settings: { constraint: { value: scale, type: 'SCALE' } },
     })
     startExport()

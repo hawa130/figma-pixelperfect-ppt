@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useRef, type ComponentProps } from 'react'
 import { clsx } from 'clsx'
+import { IconButton } from 'figma-kit'
 
 import type { Dimensions, ExportThumbnailData } from '../../shared/types'
+import { ChevronLeftIcon, ChevronRightIcon } from '../icons/chevron'
 import { postMainMessage, useMainMessageEvent } from '../lib'
 import { drawCheckerboardBackground } from '../lib/canvas'
 import { resizeImage } from '../lib/image'
+import { useEditorStore } from '../store/use-editor-store'
 import { usePluginStore } from '../store/use-plugin-store'
+import { useSharedStore } from '../store/use-shared-store'
 
 function applyCustomSize(image: ExportThumbnailData) {
   const {
@@ -118,8 +122,47 @@ export function FramePreview({ className, ...props }: ComponentProps<'div'>) {
   })
 
   return (
-    <div className={clsx('flex items-center justify-center', className)} {...props}>
+    <div className={clsx('flex flex-col items-center justify-center gap-2', className)} {...props}>
       <canvas ref={ref} className="block max-h-56 max-w-full border object-contain" />
+      <PreviewPagination />
+    </div>
+  )
+}
+
+function PreviewPagination() {
+  const editorType = useEditorStore((state) => state.editorType)
+  const previewIndex = useSharedStore((state) => state.previewIndex)
+  const previewTotal = useSharedStore((state) => state.previewTotal)
+  const setPreviewIndex = useSharedStore((state) => state.setPreviewIndex)
+
+  const setPage = (page: number) => {
+    if (page < 0 || page >= previewTotal) return
+    setPreviewIndex(page)
+  }
+
+  if (previewTotal <= 1) {
+    return null
+  }
+
+  const frameLabel = editorType === 'slides' ? 'slide' : 'frame'
+
+  return (
+    <div className="flex items-center gap-2">
+      <IconButton
+        aria-label={`Previous ${frameLabel}`}
+        onClick={() => setPage(previewIndex - 1)}
+        disabled={previewIndex === 0}
+      >
+        <ChevronLeftIcon />
+      </IconButton>
+      {previewIndex + 1} / {previewTotal}
+      <IconButton
+        aria-label={`Next ${frameLabel}`}
+        onClick={() => setPage(previewIndex + 1)}
+        disabled={previewIndex === previewTotal - 1}
+      >
+        <ChevronRightIcon />
+      </IconButton>
     </div>
   )
 }

@@ -6,24 +6,26 @@ import { getFrames, getMaxFrameDimensions, getPreviewFrame, getSelectedFrames } 
 import { getMaxSlideDimensions, getPreviewSlide, getSelectedSlides, getSlides } from './lib/get-slides'
 import { createTask } from './lib/task'
 import { defaultExportSettings } from './settings'
+import { getPluginState, pushPluginState, registerPluginStateSync, setPluginState, watch } from './store'
 
-const exportTask = createTask(async (signal, mode: 'selected' | 'all' = 'all', settings?: ExportSettings) => {
+const exportTask = createTask(async (signal, settings?: ExportSettings) => {
+  const { mode } = getPluginState()
   const frames = figma.editorType === 'slides' ? getSlides(mode) : getFrames()
   return await exportFramesAsImages(frames, settings, { signal })
 })
 
 function handleGetSelectedNodes() {
   const frames = figma.editorType === 'slides' ? getSelectedSlides() : getSelectedFrames()
-  postUIMessage({ type: 'selection_update', frameCount: frames.length })
+  setPluginState((state) => {
+    state.frameCount = frames.length
+  })
 }
 
 function handleSelectedNodeChange(event: NodeChangeEvent) {
   event.nodeChanges.forEach(async (change) => {
-    const frame = figma.editorType === 'slides' ? getPreviewSlide() : getPreviewFrame()
-    if (!frame) {
-      postUIMessage({ type: 'export_thumbnail_complete' })
-      return
-    }
+    const { mode, previewIndex } = getPluginState()
+    const { frame } =
+      figma.editorType === 'slides' ? getPreviewSlide(previewIndex, mode) : getPreviewFrame(previewIndex)
     if (change.id === frame?.id) {
       const image = await exportThumbnail(frame)
       const dimensions = figma.editorType === 'slides' ? getMaxSlideDimensions() : getMaxFrameDimensions()
@@ -33,22 +35,47 @@ function handleSelectedNodeChange(event: NodeChangeEvent) {
 }
 
 async function handleThumbnailExport() {
-  const frame = figma.editorType === 'slides' ? getPreviewSlide() : getPreviewFrame()
+  const { mode, previewIndex } = getPluginState()
+  const { frame, total, index } =
+    figma.editorType === 'slides' ? getPreviewSlide(previewIndex, mode) : getPreviewFrame(previewIndex)
+
+  setPluginState((state) => {
+    state.previewIndex = index
+    state.previewTotal = total
+  })
+
   if (!frame) {
     postUIMessage({ type: 'export_thumbnail_complete' })
     return
   }
+
   const image = await exportThumbnail(frame)
-  const dimensions = figma.editorType === 'slides' ? getMaxSlideDimensions() : getMaxFrameDimensions()
+  const dimensions = figma.editorType === 'slides' ? getMaxSlideDimensions(mode) : getMaxFrameDimensions()
   postUIMessage({ type: 'export_thumbnail_complete', image, dimensions })
 }
 
 function main() {
-  figma.on('selectionchange', handleGetSelectedNodes)
-  onUIMessage('query_selection', handleGetSelectedNodes)
+  onUIMessage('editor_meta_request', () => {
+    postUIMessage({
+      type: 'editor_meta_response',
+      state: {
+        editorType: figma.editorType,
+        documentName: figma.root.name,
+      },
+    })
+  })
 
+  figma.on('selectionchange', handleGetSelectedNodes)
+
+  registerPluginStateSync()
+  onUIMessage('plugin_sync_request', pushPluginState)
+
+  onUIMessage('export_thumbnail', handleThumbnailExport)
+  figma.on('selectionchange', handleThumbnailExport)
+  watch((state) => [state.previewIndex, state.mode], handleThumbnailExport)
+  figma.currentPage.on('nodechange', debounce({ delay: 300 }, handleSelectedNodeChange))
   onUIMessage('export_frames_as_images', async (message) => {
-    await exportTask.execute(message.mode, assign(defaultExportSettings, message.settings) as ExportSettings)
+    await exportTask.execute(assign(defaultExportSettings, message.settings) as ExportSettings)
   })
 
   onUIMessage('cancel_export', () => {
@@ -59,22 +86,14 @@ function main() {
     postUIMessage({ type: 'filename_update', filename: figma.root.name })
   })
 
-  onUIMessage('export_thumbnail', handleThumbnailExport)
-  figma.on('selectionchange', handleThumbnailExport)
-  figma.currentPage.on('nodechange', debounce({ delay: 300 }, handleSelectedNodeChange))
-
   onUIMessage('update_size', (message) => {
     figma.ui.resize(Math.ceil(message.width), Math.ceil(message.height))
-  })
-
-  onUIMessage('query_editor_type', () => {
-    postUIMessage({ type: 'editor_type_result', editorType: figma.editorType })
   })
 
   figma.showUI(__html__, {
     themeColors: true,
     width: 248,
-    height: 380,
+    height: figma.editorType === 'slides' ? 374 : 309,
   })
 }
 

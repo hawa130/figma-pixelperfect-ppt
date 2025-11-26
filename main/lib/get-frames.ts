@@ -4,11 +4,6 @@ export function getSelectedFrames() {
   return figma.currentPage.selection.filter((node) => node.type === 'FRAME')
 }
 
-export function getPreviewFrame() {
-  const frame = figma.currentPage.selection.find((node) => node.type === 'FRAME')
-  return frame ?? undefined
-}
-
 export function getFrames() {
   return getSelectedFrames()
     .map((frame) => {
@@ -17,6 +12,16 @@ export function getFrames() {
     })
     .sort((a, b) => a.pageNumber - b.pageNumber)
     .map((item) => item.frame)
+}
+
+export function getPreviewFrame(index = 0): { frame?: FrameNode; total: number; index: number } {
+  const frames = getFrames()
+  const frame = frames[index]
+  return {
+    frame: frame ?? frames[0],
+    index: frame ? index : 0,
+    total: frames.length,
+  }
 }
 
 export function getMaxFrameDimensions() {

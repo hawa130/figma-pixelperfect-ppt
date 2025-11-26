@@ -15,16 +15,11 @@ import { usePluginStore } from './store/use-plugin-store'
 export function Plugin() {
   const containerRef = useContainerSize()
 
-  const setFrameCount = usePluginStore((state) => state.setFrameCount)
   const setFilename = usePluginStore((state) => state.setFilename)
   const handleExportComplete = usePluginStore((state) => state.handleExportComplete)
   const handleExportProgress = usePluginStore((state) => state.handleExportProgress)
   const cancelExport = usePluginStore((state) => state.cancelExport)
   const handleExportError = usePluginStore((state) => state.handleExportError)
-
-  useMainMessageEvent('selection_update', (message) => {
-    setFrameCount(message.frameCount)
-  })
 
   useMainMessageEvent('export_complete', (message) => {
     void handleExportComplete(message.images)
@@ -47,7 +42,6 @@ export function Plugin() {
   })
 
   useEffect(() => {
-    postMainMessage({ type: 'query_selection' })
     postMainMessage({ type: 'query_filename' })
   }, [])
 

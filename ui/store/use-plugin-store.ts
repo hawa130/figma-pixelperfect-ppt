@@ -6,8 +6,6 @@ import type { ResizeMode } from '../lib/image'
 import { createPptxFromImages, type PptxOptions } from '../lib/pptx'
 
 interface PluginState {
-  frameCount: number
-  mode: 'selected' | 'all'
   isExporting: boolean
   message: string | Error | null
   filename: string
@@ -16,8 +14,6 @@ interface PluginState {
   customSize: { width: number; height: number; resizeMode: ResizeMode }
   originalSize: { resizeMode: ResizeMode }
 
-  setFrameCount: (count: number) => void
-  setMode: (mode: 'selected' | 'all') => void
   setIsExporting: (isExporting: boolean) => void
   setMessage: (message: string | Error | null) => void
   setFilename: (filename: string) => void
@@ -37,7 +33,6 @@ interface PluginState {
 }
 
 export const usePluginStore = create<PluginState>((set, get) => ({
-  frameCount: 0,
   mode: 'all',
   isExporting: false,
   message: null,
@@ -46,9 +41,6 @@ export const usePluginStore = create<PluginState>((set, get) => ({
   sizeMode: 'original',
   customSize: { width: 1920, height: 1080, resizeMode: 'fill' },
   originalSize: { resizeMode: 'original' },
-
-  setFrameCount: (count) => set({ frameCount: count }),
-  setMode: (mode) => set({ mode }),
   setIsExporting: (isExporting) => set({ isExporting }),
   setMessage: (message) => set({ message }),
   setFilename: (filename) => set({ filename }),
