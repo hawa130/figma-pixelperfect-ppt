@@ -3,6 +3,7 @@ import { IconButton, Popover, SegmentedControl, Select, ValueField } from 'figma
 
 import { StylesIcon } from '../icons/styles-icon'
 import type { ResizeMode } from '../lib/image'
+import { useEditorStore } from '../store/use-editor-store'
 import { usePluginStore } from '../store/use-plugin-store'
 import { FormField, FormLabel } from './form'
 import { ListGroup, ListItem } from './list'
@@ -146,11 +147,12 @@ function PresetsSelector() {
 }
 
 function OriginalResizeModeSelector() {
+  const editorType = useEditorStore((state) => state.editorType)
   const frameCount = usePluginStore((state) => state.frameCount)
   const resizeMode = usePluginStore((state) => state.originalSize.resizeMode)
   const setResizeMode = usePluginStore((state) => state.setOriginalResizeMode)
 
-  if (frameCount <= 1) {
+  if (frameCount <= 1 || editorType === 'slides') {
     return null
   }
 
