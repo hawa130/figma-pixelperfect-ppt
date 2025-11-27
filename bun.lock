@@ -20,7 +20,7 @@
         "@eslint/eslintrc": "^3.3.1",
         "@eslint/js": "^9.39.1",
         "@figma/eslint-plugin-figma-plugins": "^0.16.1",
-        "@figma/plugin-typings": "^1.119.0",
+        "@figma/plugin-typings": "^1.121.0",
         "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
         "@tailwindcss/cli": "^4.1.17",
         "@tailwindcss/postcss": "^4.1.17",
@@ -112,7 +112,7 @@
 
     "@figma/eslint-plugin-figma-plugins": ["@figma/eslint-plugin-figma-plugins@0.16.1", "https://registry.npmmirror.com/@figma/eslint-plugin-figma-plugins/-/eslint-plugin-figma-plugins-0.16.1.tgz", { "dependencies": { "@typescript-eslint/typescript-estree": "^6.13.2", "@typescript-eslint/utils": "^6.12.0", "typescript": "^5.3.2" } }, "sha512-HpBrT9IPDPxc8DSv/lJl2wX7IY5CUg23LCRgcGPhCELcHIQCEaB5QygUIM0z3MUnFkjQWZe027Rs6UZLJuhFxQ=="],
 
-    "@figma/plugin-typings": ["@figma/plugin-typings@1.119.0", "https://registry.npmmirror.com/@figma/plugin-typings/-/plugin-typings-1.119.0.tgz", {}, "sha512-DxNa0LwOBublet2iXa30Bt8zUmHXDnLrSiJOSHfL8KjyxpZv15GHgV5TIenvGI84QbQTKmXwOMAwmX/QDeDNWw=="],
+    "@figma/plugin-typings": ["@figma/plugin-typings@1.121.0", "https://registry.npmmirror.com/@figma/plugin-typings/-/plugin-typings-1.121.0.tgz", {}, "sha512-590qfxc5QtGs/AqdAEegNZUWzwEuaA9whl6T8LxscBaGjmqU3Z5jJHgHfYXissy1S5IBsXEZFmudKibpLcxGdQ=="],
 
     "@floating-ui/core": ["@floating-ui/core@1.7.3", "https://registry.npmmirror.com/@floating-ui/core/-/core-1.7.3.tgz", { "dependencies": { "@floating-ui/utils": "^0.2.10" } }, "sha512-sGnvb5dmrJaKEZ+LDIpguvdX3bDlEllmv4/ClQ9awcmCZrlx5jQyyMWFM5kBI+EyNOCDDiKk8il0zeuX3Zlg/w=="],
 

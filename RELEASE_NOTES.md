@@ -1,5 +1,14 @@
 # Release Notes
 
+## Version 1.4.0
+
+**Release Date:** 2025/11/27
+
+### What's New
+
+- Design Mode Support: Added support for exporting designs as PPT with automatic dimension configuration.
+- Enhanced Preview: Added pagination controls to navigate and preview multiple slides or frames, extending beyond the previously limited single-selection preview.
+
 ## Version 1.3.1
 
 **Release Date:** 2025/11/25
