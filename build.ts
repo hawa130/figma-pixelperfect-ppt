@@ -93,9 +93,6 @@ async function buildMain(): Promise<BuildResult> {
     transform: {
       target: 'es2017',
     },
-    treeshake: {
-      propertyWriteSideEffects: false,
-    },
   })
   const outputFile = join(buildOptions.outdir, 'main.js')
   await bundle.write({
