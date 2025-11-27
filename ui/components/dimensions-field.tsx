@@ -53,11 +53,11 @@ function CustomDimensionsField() {
       <PresetsSelector />
       <ValueField.Root>
         <ValueField.Label>W</ValueField.Label>
-        <ValueField.Numeric value={customSize.width} onChange={setCustomWidth} />
+        <ValueField.Numeric value={customSize.width} onChange={setCustomWidth} min={4} precision={0} bigNudge={50} />
       </ValueField.Root>
       <ValueField.Root>
         <ValueField.Label>H</ValueField.Label>
-        <ValueField.Numeric value={customSize.height} onChange={setCustomHeight} />
+        <ValueField.Numeric value={customSize.height} onChange={setCustomHeight} min={4} precision={0} bigNudge={50} />
       </ValueField.Root>
     </div>
   )

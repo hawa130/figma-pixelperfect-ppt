@@ -50,7 +50,6 @@ export function watch<T = any>(selector: PluginStateSelector<T>, listener: Plugi
     const selected = selector(current)
     const prevSelected = selector(prev)
     if (isEqual(selected, prevSelected)) {
-      console.log('selected', selected)
       return
     }
     listener(selected, prevSelected)

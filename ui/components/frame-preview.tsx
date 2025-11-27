@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, type ComponentProps } from 'react'
 import { clsx } from 'clsx'
-import { IconButton } from 'figma-kit'
+import { IconButton, ValueField } from 'figma-kit'
 
 import type { Dimensions, ExportThumbnailData } from '../../shared/types'
 import { ChevronLeftIcon, ChevronRightIcon } from '../icons/chevron'
@@ -147,7 +147,7 @@ function PreviewPagination() {
   const frameLabel = editorType === 'slides' ? 'slide' : 'frame'
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1">
       <IconButton
         aria-label={`Previous ${frameLabel}`}
         onClick={() => setPage(previewIndex - 1)}
@@ -155,7 +155,19 @@ function PreviewPagination() {
       >
         <ChevronLeftIcon />
       </IconButton>
-      {previewIndex + 1} / {previewTotal}
+      <div className="flex items-center gap-1">
+        <ValueField.Root>
+          <ValueField.Numeric
+            className="w-8! pl-0! text-center!"
+            value={previewIndex + 1}
+            onChange={(value) => setPage(value - 1)}
+            min={1}
+            max={previewTotal}
+            precision={0}
+          />
+        </ValueField.Root>
+        <span className="opacity-60">/ {previewTotal}</span>
+      </div>
       <IconButton
         aria-label={`Next ${frameLabel}`}
         onClick={() => setPage(previewIndex + 1)}
