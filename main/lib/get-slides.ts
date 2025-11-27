@@ -23,11 +23,30 @@ export function getSlides(mode: 'selected' | 'all' = 'all') {
     .map((item) => item.frame)
 }
 
+export interface GetPreviewSlideOptions {
+  syncWithSelection?: boolean
+}
+
 export function getPreviewSlide(
   index = 0,
   mode: 'selected' | 'all' = 'all',
+  { syncWithSelection = false }: GetPreviewSlideOptions = {},
 ): { frame?: SlideNode; total: number; index: number } {
   const slides = getSlides(mode)
+
+  if (syncWithSelection && mode === 'all') {
+    // Set the preview index to the current focused slide
+    const currentSlide = getSelectedSlides()[0] as SlideNode | undefined
+    const frameIndex = slides.findIndex((slide) => slide.id === currentSlide?.id)
+    if (frameIndex !== -1) {
+      return {
+        frame: slides[frameIndex],
+        total: slides.length,
+        index: frameIndex,
+      }
+    }
+  }
+
   const frame = slides[index]
   return {
     frame: frame ?? slides[0],
