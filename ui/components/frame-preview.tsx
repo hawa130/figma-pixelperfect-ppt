@@ -166,7 +166,7 @@ function PreviewPagination() {
             precision={0}
           />
         </ValueField.Root>
-        <span className="opacity-60">/ {previewTotal}</span>
+        <span className="text-text-secondary">/ {previewTotal}</span>
       </div>
       <IconButton
         aria-label={`Next ${frameLabel}`}
