@@ -1,4 +1,4 @@
-import { assign, debounce } from 'radashi'
+import { debounce } from 'radashi'
 
 import { onUIMessage, postUIMessage } from './lib'
 import { exportFramesAsImages, exportThumbnail } from './lib/export'
@@ -84,7 +84,7 @@ function main() {
   )
   figma.currentPage.on('nodechange', debounce({ delay: 300 }, handleSelectedNodeChange))
   onUIMessage('export_frames_as_images', async (message) => {
-    await exportTask.execute(assign(defaultExportSettings, message.settings) as ExportSettings)
+    await exportTask.execute(Object.assign(defaultExportSettings, message.settings) as ExportSettings)
   })
 
   onUIMessage('cancel_export', () => {

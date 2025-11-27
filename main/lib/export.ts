@@ -28,17 +28,17 @@ export async function exportFramesAsImages(
     const images: ExportImageData[] = []
 
     for (const [index, frame] of frames.entries()) {
-      postUIMessage({
-        type: 'export_progress',
-        current: index + 1,
-        total: frames.length,
-      })
-
       if (options.signal?.aborted) {
         postUIMessage({ type: 'export_cancelled' })
         figma.notify('Export cancelled', { timeout: 2000 })
         return
       }
+
+      postUIMessage({
+        type: 'export_progress',
+        current: index + 1,
+        total: frames.length,
+      })
 
       await new Promise((resolve) => setTimeout(resolve, 50))
       const imageData = await exportFrameAsImage(frame, settings)

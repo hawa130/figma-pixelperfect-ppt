@@ -1,4 +1,4 @@
-import { cloneDeep, isEqual } from 'radashi'
+import { cloneDeep, FastCloningStrategy, isEqual } from 'radashi'
 
 import type { PluginSharedState } from '../shared/state'
 import { onUIMessage, postUIMessage } from './lib'
@@ -28,7 +28,7 @@ export function pushPluginState() {
 
 export function registerPluginStateSync() {
   onUIMessage('plugin_shared_sync', (message) => {
-    const prevState = cloneDeep(pluginState)
+    const prevState = cloneDeep(pluginState, FastCloningStrategy)
     Object.assign(pluginState, message.state)
     notifySubscribers(prevState)
   })
