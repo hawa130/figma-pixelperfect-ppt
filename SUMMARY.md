@@ -2,7 +2,9 @@
 
 Export your Figma Slides or Figma Design to pixel-perfect bitmap PowerPoint presentations.
 
-This plugin exports slides or frames as high-quality bitmap images embedded in PowerPoint format. Slide dimensions can be automatically configured or manually set with resize modes. The exported slides cannot be edited in PowerPoint, but this ensures perfect visual fidelity—every font, effect, and design detail is preserved exactly as designed.
+This plugin exports slides or frames as high-quality bitmap images embedded in PowerPoint format. Slide dimensions can be automatically configured or manually set with resize modes.
+
+The exported slides cannot be edited in PowerPoint, but this ensures perfect visual fidelity—every font, effect, and design detail is preserved exactly as designed. Bitmap-based slides ensure consistent appearance across all devices and platforms, making them ideal for distribution and presentation on any device.
 
 Unlike Figma's built-in PowerPoint export which is editable but has rendering issues, this solution maintains visual accuracy while preserving PowerPoint's presentation functionality.
 
@@ -21,7 +23,9 @@ Unlike Figma's built-in PowerPoint export which is editable but has rendering is
 
 将 Figma Slide 和 Figma Design 导出为像素完美的位图PPT。
 
-本插件将幻灯片或 frame 导出为高质量位图并嵌入 PowerPoint 格式。幻灯片尺寸既能自动设置，也能手动配置，同时支持设置填充模式。导出的幻灯片无法在 PowerPoint 中编辑，但能完美还原设计——所有字体、效果和设计细节都能精确保留。
+本插件将幻灯片或 frame 导出为高质量位图并嵌入 PowerPoint 格式。幻灯片尺寸既能自动设置，也能手动配置，同时支持设置填充模式。
+
+导出的幻灯片无法在 PowerPoint 中编辑，但能完美还原设计——所有字体、效果和设计细节都能精确保留。基于位图的幻灯片确保在所有设备和平台上都能保持一致的视觉效果，非常适合分发或在其他设备上演示。
 
 与 Figma 自带的 PowerPoint 导出虽然可编辑但存在渲染问题不同，本方案既保证视觉准确性，又保留演讲功能。
 
