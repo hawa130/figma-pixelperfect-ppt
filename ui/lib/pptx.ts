@@ -10,11 +10,26 @@ function pixelsToInches(pixels: number): number {
   return pixels / PIXELS_PER_INCH
 }
 
+export interface PptxMetadata {
+  title?: string
+  subject?: string
+  author?: string
+  company?: string
+}
+
 export interface PptxOptions {
   width?: number
   height?: number
   scale?: number
   mode?: ResizeMode
+  metadata?: PptxMetadata
+}
+
+const DEFAULT_METADATA: Required<PptxMetadata> = {
+  title: 'PixelPerfect PPT Presentation',
+  subject: 'PixelPerfect PPT Presentation',
+  author: 'PixelPerfect PPT',
+  company: 'PixelPerfect PPT',
 }
 
 export async function createPptxFromImages(images: ExportImageData[], options: PptxOptions = {}): Promise<Blob> {
@@ -22,7 +37,7 @@ export async function createPptxFromImages(images: ExportImageData[], options: P
     throw new Error('No slides to export')
   }
 
-  const { width, height, scale, mode = 'fill' } = options
+  const { width, height, scale, mode = 'fill', metadata = DEFAULT_METADATA } = options
   const globalWidth = width ?? Math.max(...images.map((img) => img.width))
   const globalHeight = height ?? Math.max(...images.map((img) => img.height))
 
@@ -30,6 +45,14 @@ export async function createPptxFromImages(images: ExportImageData[], options: P
   const heightInches = pixelsToInches(globalHeight)
 
   const pptx = new PptxGenJS()
+
+  if (metadata) {
+    pptx.title = metadata.title ?? DEFAULT_METADATA.title
+    pptx.subject = metadata.subject ?? DEFAULT_METADATA.subject
+    pptx.author = metadata.author ?? DEFAULT_METADATA.author
+    pptx.company = metadata.company ?? DEFAULT_METADATA.company
+  }
+
   pptx.defineLayout({
     name: 'custom',
     width: widthInches,

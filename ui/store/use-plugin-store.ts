@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import type { ExportImageData } from '../../shared/types'
 import { downloadFile } from '../lib/download'
 import type { ResizeMode } from '../lib/image'
-import { createPptxFromImages, type PptxOptions } from '../lib/pptx'
+import { createPptxFromImages, type PptxMetadata, type PptxOptions } from '../lib/pptx'
 
 interface PluginState {
   isExporting: boolean
@@ -67,6 +67,10 @@ export const usePluginStore = create<PluginState>((set, get) => ({
     set({ message: 'Creating PPTX file...' })
     try {
       const state = get()
+      const metadata: PptxMetadata = {
+        title: state.filename,
+        subject: state.filename,
+      }
       const settings: PptxOptions | undefined =
         state.sizeMode === 'custom'
           ? {
@@ -74,10 +78,12 @@ export const usePluginStore = create<PluginState>((set, get) => ({
               height: state.customSize.height,
               scale: state.scale,
               mode: state.customSize.resizeMode,
+              metadata,
             }
           : {
               scale: state.scale,
               mode: state.originalSize.resizeMode,
+              metadata,
             }
       const blob = await createPptxFromImages(images, settings)
       downloadFile({ filename: `${state.filename}.pptx`, blob })
