@@ -192,22 +192,24 @@
   --radius: var(--radius-sm);
 }
 
-body {
-  @apply antialiased;
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-family-default);
-  font-size: var(--font-size-default);
-  line-height: var(--line-height-3);
-  letter-spacing: var(--letter-spacing-3);
-  font-weight: var(--font-weight-default);
-}
+@layer base {
+  body {
+    @apply antialiased;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-family-default);
+    font-size: var(--font-size-default);
+    line-height: var(--line-height-3);
+    letter-spacing: var(--letter-spacing-3);
+    font-weight: var(--font-weight-default);
+  }
 
-* {
-  border-color: var(--color-border);
-}
+  * {
+    border-color: var(--color-border);
+  }
 
-::selection {
-  background-color: var(--color-bg-selected-hover);
-  color: var(--color-text-onselected);
+  ::selection {
+    background-color: var(--color-bg-selected-hover);
+    color: var(--color-text-onselected);
+  }
 }
