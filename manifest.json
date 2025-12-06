@@ -7,7 +7,7 @@
   "capabilities": [],
   "enableProposedApi": false,
   "documentAccess": "dynamic-page",
-  "editorType": ["figma", "slides"],
+  "editorType": ["figma", "slides", "buzz"],
   "networkAccess": {
     "allowedDomains": ["none"]
   }

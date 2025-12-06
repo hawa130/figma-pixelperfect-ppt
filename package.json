@@ -31,7 +31,7 @@
     "postcss": "^8.5.6",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.7.2",
-    "rolldown": "^1.0.0-beta.52",
+    "rolldown": "1.0.0-beta.51",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.48.1"
