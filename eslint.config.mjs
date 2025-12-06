@@ -1,13 +1,9 @@
-import { FlatCompat } from '@eslint/eslintrc'
 import js from '@eslint/js'
+import * as figmaPlugin from '@figma/eslint-plugin-figma-plugins'
 import reactHooks from 'eslint-plugin-react-hooks'
 import { defineConfig, globalIgnores } from 'eslint/config'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
-
-const compat = new FlatCompat({
-  baseDirectory: import.meta.dirname,
-})
 
 export default defineConfig([
   {
@@ -23,14 +19,6 @@ export default defineConfig([
   tseslint.configs.recommendedTypeChecked,
   tseslint.configs.stylisticTypeChecked,
   {
-    languageOptions: {
-      parserOptions: {
-        projectService: {
-          allowDefaultProject: ['*.{ts,tsx,js,jsx,mjs}'],
-        },
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
     rules: {
       '@typescript-eslint/prefer-nullish-coalescing': ['error', { ignorePrimitives: { boolean: true, string: true } }],
       '@typescript-eslint/no-inferrable-types': ['error', { ignoreParameters: true }],
@@ -46,13 +34,28 @@ export default defineConfig([
           varsIgnorePattern: '^_',
         },
       ],
+      '@typescript-eslint/no-unsafe-assignment': 'warn',
+      '@typescript-eslint/consistent-type-definitions': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-argument': 'off',
       '@typescript-eslint/prefer-regexp-exec': 'off',
       '@typescript-eslint/consistent-indexed-object-style': 'off',
+      '@typescript-eslint/no-redundant-type-constituents': 'off',
     },
   },
-  ...compat.extends('plugin:@figma/figma-plugins/recommended'),
+  {
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+  {
+    files: ['**/*.{mjs,js}'],
+    extends: [tseslint.configs.disableTypeChecked],
+  },
+  figmaPlugin.flatConfigs.recommended,
   reactHooks.configs.flat['recommended-latest'],
-  globalIgnores(['node_modules/', 'dist/']),
+  globalIgnores(['build.ts', 'node_modules/', 'dist/']),
 ])

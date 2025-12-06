@@ -1,4 +1,4 @@
-import { Dimensions } from '../../shared/types'
+import type { Dimensions } from '../../shared/types'
 
 export function getSelectedSlides() {
   const selectedSlides = figma.currentPage.selection.filter((node) => node.type === 'SLIDE')
