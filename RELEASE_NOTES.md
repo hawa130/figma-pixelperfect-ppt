@@ -1,5 +1,13 @@
 # Release Notes
 
+## Version 1.4.1
+
+**Release Date:** 2025/11/28
+
+### What's New
+
+- Figma Buzz Support: Added support for exporting Figma Buzz designs.
+
 ## Version 1.4.0
 
 **Release Date:** 2025/11/27
