@@ -30,3 +30,8 @@
 
 - Figma Slides 文件或 Figma Design
 - Figma 桌面应用或浏览器
+
+## 链接
+
+- 立即在 Figma 社区体验 PixelPerfect PPT：[PixelPerfect PPT](https://www.figma.com/community/plugin/1570841780768228356/pixelperfect-ppt)
+- 查看我开发的另一款插件（GitHub）：[hawa130/figma-livetex-math](https://github.com/hawa130/figma-livetex-math)

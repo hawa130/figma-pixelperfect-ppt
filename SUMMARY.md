@@ -17,6 +17,8 @@ Unlike Figma's built-in PowerPoint export which is editable but has rendering is
 - Automatic slide ordering by page numbers
 - Runs entirely locally with no network access
 
+PixelPerfect PPT is open source on GitHub: [hawa130/figma-pixelperfect-ppt](https://github.com/hawa130/figma-pixelperfect-ppt). If you also work with equations, try my other plugin: [LiveTeX Math - Ultimate LaTeX equation toolkit](https://www.figma.com/community/plugin/1578050259390493409/livetex-math-ultimate-latex-equation-toolkit).
+
 ---
 
 # PixelPerfect PPT
@@ -37,3 +39,5 @@ Unlike Figma's built-in PowerPoint export which is editable but has rendering is
 - 实时导出进度跟踪和取消功能
 - 自动按页码排序保证顺序
 - 纯本地运行，不访问网络
+
+PixelPerfect PPT 已开源到 GitHub：[hawa130/figma-pixelperfect-ppt](https://github.com/hawa130/figma-pixelperfect-ppt)。如果你也有公式排版需求，推荐试试我开发的另一款插件：[LiveTeX Math - Ultimate LaTeX equation toolkit](https://www.figma.com/community/plugin/1578050259390493409/livetex-math-ultimate-latex-equation-toolkit)。

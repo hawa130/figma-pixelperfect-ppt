@@ -26,7 +26,7 @@ English | [中文](README_ZH.md)
 
 The plugin exports your designs as high-quality bitmap images embedded in PowerPoint format. While the exported slides cannot be edited in PowerPoint, this ensures perfect visual fidelity—every font, effect, and design detail is preserved exactly as designed. Bitmap-based slides ensure consistent appearance across all devices and platforms, making them ideal for distribution and presentation on any device.
 
-## Requirements
+## Links
 
-- Figma Slides file or Figma Design
-- Figma desktop app or browser
+- Try PixelPerfect PPT now on Figma Community: [PixelPerfect PPT](https://www.figma.com/community/plugin/1570841780768228356/pixelperfect-ppt)
+- Explore another plugin by me on GitHub: [hawa130/figma-livetex-math](https://github.com/hawa130/figma-livetex-math)
