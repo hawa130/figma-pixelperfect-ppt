@@ -112,6 +112,7 @@ async function buildUi() {
   const bundle = await rolldown({
     input: buildOptions.entries.ui,
     platform: 'browser',
+    external: ['canvg', 'dompurify', 'html2canvas'],
   })
   const { output: uiOutput } = await bundle.generate({
     format: 'iife',

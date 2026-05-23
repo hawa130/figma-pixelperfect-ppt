@@ -5,6 +5,7 @@ import { FormField, FormLabel, FormSection } from './form'
 
 export function FilenameField() {
   const filename = usePluginStore((state) => state.filename)
+  const exportFormat = usePluginStore((state) => state.exportFormat)
   const setFilename = usePluginStore((state) => state.setFilename)
 
   return (
@@ -18,7 +19,7 @@ export function FilenameField() {
             value={filename}
             onChange={(e) => setFilename(e.target.value)}
           />
-          <span className="fp-ValueFieldLabel w-auto! pr-1.5">.pptx</span>
+          <span className="fp-ValueFieldLabel w-auto! pr-1.5">.{exportFormat}</span>
         </label>
       </FormField>
     </FormSection>

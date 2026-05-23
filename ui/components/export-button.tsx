@@ -8,6 +8,7 @@ import { CancelButton } from './cancel-button'
 export function ExportButton() {
   const isExporting = usePluginStore((state) => state.isExporting)
   const message = usePluginStore((state) => state.message)
+  const exportFormat = usePluginStore((state) => state.exportFormat)
   const scale = usePluginStore((state) => state.scale)
   const startExport = usePluginStore((state) => state.startExport)
 
@@ -26,7 +27,7 @@ export function ExportButton() {
       <div className="min-h-5 flex-1 font-normal">{typeof message === 'string' && message}</div>
       {!isExporting ? (
         <Button variant="primary" onClick={handleExport} disabled={!canExport}>
-          Export to PPTX
+          Export to {exportFormat.toUpperCase()}
         </Button>
       ) : (
         <CancelButton />

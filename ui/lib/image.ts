@@ -1,11 +1,15 @@
 export type ResizeMode = 'fill' | 'fit' | 'original' | 'stretch' | 'scale-down'
 
-export interface ResizeOptionsBase {
+export interface ImageCanvasOptions {
   input: Uint8Array
   width: number
   height: number
   mode?: ResizeMode
   scale?: number
+  backgroundColor?: string
+}
+
+export interface ResizeOptionsBase extends ImageCanvasOptions {
   mimeType?: 'image/png' | 'image/jpeg' | 'image/webp'
   quality?: number
 }
@@ -20,19 +24,15 @@ export interface ResizeOptionsBlob extends ResizeOptionsBase {
 
 export type ResizeOptions = ResizeOptionsUint8Array | ResizeOptionsBlob
 
-export function resizeImage(options: ResizeOptionsUint8Array): Promise<Uint8Array>
-export function resizeImage(options: ResizeOptionsBlob): Promise<Blob>
-export async function resizeImage({
+export async function createImageCanvas({
   input,
   width,
   height,
   mode = 'fill',
   scale = 1,
-  mimeType = 'image/png',
-  quality = 0.95,
-  outputType = 'uint8array',
-}: ResizeOptions): Promise<Uint8Array | Blob> {
-  const blob = new Blob([input as BlobPart], { type: mimeType })
+  backgroundColor,
+}: ImageCanvasOptions): Promise<HTMLCanvasElement> {
+  const blob = new Blob([input as BlobPart], { type: 'image/png' })
   const bitmap = await createImageBitmap(blob)
 
   const { width: srcW, height: srcH } = bitmap
@@ -101,8 +101,31 @@ export async function resizeImage({
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('Canvas 2D context not available')
 
+  if (backgroundColor) {
+    ctx.fillStyle = backgroundColor
+    ctx.fillRect(0, 0, targetWidth, targetHeight)
+  }
+
   ctx.drawImage(bitmap, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
   bitmap.close()
+
+  return canvas
+}
+
+export function resizeImage(options: ResizeOptionsUint8Array): Promise<Uint8Array>
+export function resizeImage(options: ResizeOptionsBlob): Promise<Blob>
+export async function resizeImage({
+  input,
+  width,
+  height,
+  mode = 'fill',
+  scale = 1,
+  backgroundColor,
+  mimeType = 'image/png',
+  quality = 0.95,
+  outputType = 'uint8array',
+}: ResizeOptions): Promise<Uint8Array | Blob> {
+  const canvas = await createImageCanvas({ input, width, height, mode, scale, backgroundColor })
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(

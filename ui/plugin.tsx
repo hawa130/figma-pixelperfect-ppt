@@ -4,6 +4,7 @@ import { DimensionsField } from './components/dimensions-field'
 import { ExportButton } from './components/export-button'
 import { FilenameField } from './components/filename-field'
 import { Form, FormRow, FormSection } from './components/form'
+import { FormatField } from './components/format-field'
 import { FramePreview } from './components/frame-preview'
 import { MessageDisplay } from './components/message-display'
 import { ModeSelector } from './components/mode-selector'
@@ -50,6 +51,7 @@ export function Plugin() {
       <ModeSelector />
       <Form>
         <FilenameField />
+        <FormatField />
         <FormSection>
           <QualityField />
           <DimensionsField />
